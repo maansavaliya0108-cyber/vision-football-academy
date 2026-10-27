@@ -1,13 +1,12 @@
 import { academy } from '../../shared/academy.js'
+import { SectionTitle } from './SectionTitle'
 
 export function Pathway() {
   return (
     <section className="pathway" id="pathway" aria-labelledby="pathway-title">
       <div className="wrap">
         <header className="pathway__head">
-          <h2 id="pathway-title" className="section-title">
-            Match time is the measure
-          </h2>
+          <SectionTitle id="pathway-title">Match time is the measure</SectionTitle>
           <p className="pathway__intro">
             The academy judges progress by how much real football its players get. Instead of keeping them on the
             training ground, it puts registered players forward for official trials, cups and leagues.

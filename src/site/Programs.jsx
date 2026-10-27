@@ -1,13 +1,20 @@
 import { useId, useRef, useState } from 'react'
 import { academy } from '../../shared/academy.js'
 import { Link } from '../router'
+import { fitStyle } from './fit'
 import { TickIcon } from './icons'
+import { SectionTitle } from './SectionTitle'
 import { useMediaQuery } from './useMediaQuery'
+
+// One shared size for the program names on phones, set by the widest word among them.
+const nameFit = fitStyle(academy.programs.map((p) => p.name).join(' '))
 
 function ProgramDetail({ program, onEnquire, headingLevel: H = 'h3' }) {
   return (
     <>
-      <H className="program__name">{program.name}</H>
+      <H className="program__name" style={nameFit}>
+        {program.name}
+      </H>
       <p className="program__summary">{program.summary}</p>
       <dl className="program__facts">
         <div>
@@ -140,9 +147,7 @@ export function Programs({ onEnquire }) {
   const narrow = useMediaQuery('(max-width: 860px)')
   const header = (
     <>
-      <h2 id="programs-title" className="section-title">
-        Five ways to train
-      </h2>
+      <SectionTitle id="programs-title">Five ways to train</SectionTitle>
       <p className="programs__intro">
         From a first kickabout to an overseas pathway. Not sure which fits? Send an enquiry and the academy will help
         you choose.

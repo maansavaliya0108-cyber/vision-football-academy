@@ -1,5 +1,6 @@
 import { academy } from '../../shared/academy.js'
 import { Stars } from './icons'
+import { SectionTitle } from './SectionTitle'
 
 /** The one volt section: the ratings set as a scoreline. */
 export function Reputation() {
@@ -7,9 +8,7 @@ export function Reputation() {
   return (
     <section className="reputation" id="reviews" aria-labelledby="reviews-title">
       <div className="wrap">
-        <h2 id="reviews-title" className="section-title">
-          What Surat families say
-        </h2>
+        <SectionTitle id="reviews-title">What Surat families say</SectionTitle>
         <div className="scoreline">
           {academy.ratings.map((r) => (
             <div key={r.source} className="scoreline__side">

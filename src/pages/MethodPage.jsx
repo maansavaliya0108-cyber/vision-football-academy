@@ -3,6 +3,7 @@ import { Link } from '../router'
 import { Method } from '../site/Method'
 import { Pathway } from '../site/Pathway'
 import { Reputation } from '../site/Reputation'
+import { SectionTitle } from '../site/SectionTitle'
 import { CtaBand, PageHero } from './PageHero'
 
 export default function MethodPage() {
@@ -21,9 +22,7 @@ export default function MethodPage() {
       {/* The idea in one comparison: what most drills ask of a player, and what this method asks. */}
       <section className="contrast" aria-labelledby="contrast-title">
         <div className="wrap">
-          <h2 id="contrast-title" className="section-title">
-            Problems, not instructions
-          </h2>
+          <SectionTitle id="contrast-title">Problems, not instructions</SectionTitle>
           <div className="contrast__grid">
             <div className="contrast__side">
               <p className="contrast__tag">Rigid drills</p>

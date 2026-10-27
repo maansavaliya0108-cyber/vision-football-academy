@@ -11,6 +11,8 @@
 
 .section-title {
   font-size: var(--step-5);
+  /* --fit (from SectionTitle) is the widest word in em; on a phone it must fit between the gutters. */
+  font-size: min(var(--step-5), (100vw - 2 * var(--gutter)) / (var(--fit, 1) * 1.04));
   text-transform: uppercase;
   max-width: 17ch;
 }
@@ -255,6 +257,12 @@
   .nav__actions .btn--small {
     padding-inline: 0.85rem;
     font-size: 0.82rem;
+  }
+}
+@media (max-width: 374px) {
+  /* The smallest phones fit "Join" in the nav and the quick bar, but not the full label. */
+  .join-more {
+    display: none;
   }
 }
 
@@ -677,8 +685,9 @@
 }
 .quarters {
   position: relative;
+  container-type: inline-size;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-m);
   overflow: hidden;
@@ -728,6 +737,9 @@
 }
 .quarter__name {
   font-size: var(--step-4);
+  /* --fit is the widest name's width in em (from Method). The space it must fit is half the board,
+     less the wider left padding of the right-hand quarters and the right padding. */
+  font-size: min(var(--step-4), (50cqi - clamp(4rem, 9vw, 7.5rem) - clamp(1.75rem, 4vw, 3.5rem)) / (var(--fit, 8) * 1.02));
   text-transform: uppercase;
 }
 .quarter__title {
@@ -768,7 +780,7 @@
     grid-template-columns: 1fr;
   }
   .quarters {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .quarter {
     min-height: 0;
@@ -777,6 +789,9 @@
   }
   .quarter::before {
     left: 1.5rem;
+  }
+  .quarter__name {
+    font-size: min(var(--step-4), (100cqi - 3rem) / (var(--fit, 8) * 1.02));
   }
   .quarter:not(:last-of-type) {
     border-bottom: 1px solid var(--line-strong);
@@ -958,6 +973,7 @@
 }
 .program--inline {
   position: static;
+  container-type: inline-size;
   margin: 0.75rem 0 1.25rem;
   padding: 1.6rem 1.35rem;
 }
@@ -965,6 +981,8 @@
   font-weight: 800;
   font-stretch: 125%;
   font-size: 1.8rem;
+  /* --fit is the widest word across all program names, so every name fits at the same size. */
+  font-size: min(1.8rem, 100cqi / (var(--fit, 1) * 1.02));
   line-height: 1;
 }
 @media (max-width: 480px) {
@@ -1611,7 +1629,9 @@
     bottom: calc(0.75rem + env(safe-area-inset-bottom));
     z-index: 40;
     display: grid;
-    grid-template-columns: auto auto 1fr;
+    /* minmax(0, …): a label that can't wrap must never widen the bar past the screen. Even hidden
+       below the fold, a too-wide fixed bar makes phones lay out the whole page wider. */
+    grid-template-columns: auto auto minmax(0, 1fr);
     gap: 0.4rem;
     padding: 0.4rem;
     border-radius: 999px;
@@ -1793,6 +1813,9 @@
   gap: 2rem 4rem;
   align-items: center;
 }
+.page-hero__copy {
+  container-type: inline-size;
+}
 .crumbs ol {
   list-style: none;
   margin: 0 0 1.75rem;
@@ -1821,6 +1844,8 @@
 }
 .page-hero__title {
   font-size: clamp(2.6rem, 1rem + 5.2vw, 6.6rem);
+  /* --fit is the widest word's width in em (from PageHero), so that word always fits the column. */
+  font-size: min(clamp(2.6rem, 1rem + 5.2vw, 6.6rem), 100cqi / (var(--fit, 10) * 1.02));
   font-weight: 900;
   line-height: 0.88;
   letter-spacing: -0.035em;
@@ -1913,7 +1938,7 @@
 }
 @media (max-width: 860px) {
   .page-hero__grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
   .page-hero__pitch {
     display: none;

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { academy } from '../../shared/academy.js'
+import { SectionTitle } from './SectionTitle'
 
 /** Structured data so search engines can show these answers directly. */
 function useFaqSchema() {
@@ -26,9 +27,7 @@ export function Faq() {
     <section className="faq" id="faq" aria-labelledby="faq-title">
       <div className="wrap faq__grid">
         <div>
-          <h2 id="faq-title" className="section-title">
-            Questions parents ask
-          </h2>
+          <SectionTitle id="faq-title">Questions parents ask</SectionTitle>
           <p className="faq__intro">
             Anything else? Call or WhatsApp <a href={`tel:${academy.phone.tel}`}>{academy.phone.display}</a>.
           </p>

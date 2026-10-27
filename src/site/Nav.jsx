@@ -54,7 +54,10 @@ export function Nav({ path }) {
             {academy.phone.display}
           </a>
           <Link className="btn btn--volt btn--small" to={joinTarget(path)} onClick={() => setOpen(false)}>
-            Join the academy
+            {/* One wrapper, so the button's flex gap doesn't open up between the two halves. */}
+            <span>
+              Join<span className="join-more"> the academy</span>
+            </span>
           </Link>
           <button
             className="nav__toggle"

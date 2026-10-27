@@ -2,6 +2,7 @@ import { useId, useRef, useState } from 'react'
 import { academy, experienceLevels } from '../../shared/academy.js'
 import { STATIC } from '../config'
 import { ChatIcon, PhoneIcon, TickIcon } from './icons'
+import { SectionTitle } from './SectionTitle'
 
 const empty = {
   playerName: '',
@@ -131,9 +132,7 @@ export function Enquiry({ program, onProgramChange }) {
     <section className="join" id="join" aria-labelledby="join-title">
       <div className="wrap join__grid">
         <div className="join__intro">
-          <h2 id="join-title" className="section-title">
-            Join the academy
-          </h2>
+          <SectionTitle id="join-title">Join the academy</SectionTitle>
           <p>
             Tell us about the player and the academy will call you back to talk through programs and arrange a visit
             to the ground.

@@ -1,6 +1,7 @@
 import { academy } from '../../shared/academy.js'
 import { Link } from '../router'
 import { TickIcon } from '../site/icons'
+import { SectionTitle } from '../site/SectionTitle'
 import { CtaBand, PageHero } from './PageHero'
 
 const choose = academy.faq.find((f) => f.q.startsWith('Which program'))
@@ -64,9 +65,7 @@ export default function ProgramsPage() {
       {choose && (
         <section className="chooser" aria-labelledby="chooser-title">
           <div className="wrap chooser__grid">
-            <h2 id="chooser-title" className="section-title">
-              Not sure which one?
-            </h2>
+            <SectionTitle id="chooser-title">Not sure which one?</SectionTitle>
             <p className="chooser__body">{choose.a}</p>
           </div>
         </section>

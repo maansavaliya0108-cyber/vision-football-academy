@@ -4,6 +4,7 @@ import { formatTime } from '../../shared/schedule.js'
 import { useTrainingStatus } from './useTrainingStatus'
 import { StatusBadge } from './Story'
 import { ChatIcon, PhoneIcon, PinIcon } from './icons'
+import { SectionTitle } from './SectionTitle'
 
 function LazyMap() {
   const box = useRef(null)
@@ -36,9 +37,7 @@ export function Visit() {
     <section className="visit" id="visit" aria-labelledby="visit-title">
       <div className="wrap visit__grid">
         <div className="visit__times">
-          <h2 id="visit-title" className="section-title">
-            Monday to Friday, 6 to 9 PM
-          </h2>
+          <SectionTitle id="visit-title">Monday to Friday, 6 to 9 PM</SectionTitle>
           <StatusBadge status={status} />
           <table className="fixtures">
             <caption className="visually-hidden">Weekly training timings</caption>

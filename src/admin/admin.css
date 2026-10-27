@@ -6,20 +6,25 @@ body {
 .adm-signin {
   min-height: 100vh;
   display: grid;
+  /* A shrinkable column, so the card's min(100%, 25rem) is measured against the screen. */
+  grid-template-columns: minmax(0, 1fr);
   place-items: center;
   padding: 1rem;
 }
 .adm-card {
   width: min(100%, 25rem);
+  container-type: inline-size;
   display: grid;
   gap: 0.8rem;
-  padding: 2.25rem;
+  padding: clamp(1.25rem, 6vw, 2.25rem);
   border-radius: var(--radius-m);
   background: var(--carbon);
   border: 1px solid var(--line-strong);
 }
 .adm-card h1 {
   font-size: 2.6rem;
+  /* "Enquiries" in display capitals is about 7.1em wide: keep it inside the card on small phones. */
+  font-size: min(2.6rem, 100cqi / 7.3);
   text-transform: uppercase;
   margin-top: 0.5rem;
 }

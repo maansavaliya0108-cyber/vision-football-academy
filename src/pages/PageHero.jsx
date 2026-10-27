@@ -1,4 +1,5 @@
 import { Link } from '../router'
+import { widestWordEm } from '../site/fit'
 
 /**
  * The top of every inner page: where you are, the page title set huge, and a pitch diagram that
@@ -6,6 +7,9 @@ import { Link } from '../router'
  * `marks` are [x, y] spots on the 200 × 300 diagram for the volt player dots.
  */
 export function PageHero({ crumbs = [], title, lede, children, marks = [[100, 196], [128, 110], [62, 150]] }) {
+  // The title is set so large that its widest word decides whether it fits a phone; CSS uses this
+  // to cap the size so a word like "INTERNATIONAL" never runs off the screen.
+  const fit = widestWordEm(title).toFixed(2)
   return (
     <header className="page-hero">
       <div className="wrap page-hero__grid">
@@ -20,7 +24,9 @@ export function PageHero({ crumbs = [], title, lede, children, marks = [[100, 19
               ))}
             </ol>
           </nav>
-          <h1 className="page-hero__title">{title}</h1>
+          <h1 className="page-hero__title" style={{ '--fit': fit }}>
+            {title}
+          </h1>
           {lede && <p className="page-hero__lede">{lede}</p>}
           {children && <div className="page-hero__actions">{children}</div>}
         </div>

@@ -5,6 +5,7 @@ import { Enquiry } from '../site/Enquiry'
 import { TickIcon } from '../site/icons'
 import { Method } from '../site/Method'
 import { Pathway } from '../site/Pathway'
+import { SectionTitle } from '../site/SectionTitle'
 import NotFound from '../NotFound'
 import { PageHero } from './PageHero'
 
@@ -61,9 +62,7 @@ export default function ProgramPage({ id }) {
 
       <section className="focus" aria-labelledby="focus-title">
         <div className="wrap focus__grid">
-          <h2 id="focus-title" className="section-title">
-            What the sessions work on
-          </h2>
+          <SectionTitle id="focus-title">What the sessions work on</SectionTitle>
           <ol className="focus__list">
             {program.focus.map((f) => (
               <li key={f}>

@@ -1,6 +1,6 @@
 # Site audit
 
-Five audits were run on 26–27 October 2026 before publishing. Each one was automated (headless Chrome driven by Puppeteer, plus axe-core and Lighthouse) and run against the production build, then run again after the fixes. Everything below reflects the final state.
+Five audits were run on 26–27 October 2026 before publishing. Each one was automated (headless Chrome driven by Puppeteer, plus axe-core and Lighthouse) and run against the production build, then run again after the fixes. The live site was checked again after publishing, which turned up one more problem: big headings running off narrow phone screens (see [After publishing](#after-publishing-the-live-site)). Everything below reflects the final state.
 
 | # | Audit | Result |
 | --- | --- | --- |
@@ -161,8 +161,47 @@ Also:
 - The dashboard would have switched on with the example password `change-me`. It now stays off until a password of at least 8 characters is set.
 - Removed an unused animation library (`motion`).
 
+## After publishing: the live site
+
+The GitHub Pages site was checked again once it was live. The static-build function checks above all passed on the real address.
+
+Lighthouse on the live site:
+
+| Page | Performance | Accessibility | Best practices | SEO |
+| --- | --- | --- | --- | --- |
+| Home, phone | 85–96 | 100 | 100 | 100 |
+| Program page, phone | 98 | 100 | 100 | 100 |
+| Visit, phone | 99 | 100 | 100 | 100 |
+| Home, desktop | 99 | 100 | 100 | 100 |
+
+The phone home page varies with GitHub's CDN: the first, uncached load paints in about 2 s, a cached one in 0.8 s.
+
+**Found and fixed: big headings ran off narrow phone screens.** A screenshot of the live site showed "GOALKEEPING" cut off at the right edge on a phone. A stricter check then found more cases:
+
+- **Page titles:** "RECREATIONAL", "INTERNATIONAL" and "DEVELOPMENT" are single words wider than a 320–414 px screen at the title size. They dragged the intro text and buttons past the edge too.
+- **"Problems, not instructions":** on phones up to about 420 px, "INSTRUCTIONS" is wider than the screen. The phone then laid the whole page out wider, which pushed the menu button off-screen on the Method page.
+- **The four method cards:** their names didn't fit at tablet and 320 px widths.
+- **The open program on the home page** at 320 px.
+- **The staff sign-in card** at 320 px.
+- **The nav and quick contact bar's "Join the academy" buttons** didn't fit at 320 px.
+
+The fixes:
+
+- **Big headings:** they now know how wide their widest word is in this typeface. The width comes from a measured table of letter widths that slightly over-estimates, so it's on the safe side. Each heading's size is capped so that word fits its column. Desktop sizes are unchanged.
+- **Grid columns** can now shrink below their content.
+- **On phones under 375 px,** the nav and quick bar buttons say "Join".
+
+**Why the earlier checks missed it.** They compared page width with the window width, and a phone widens its layout to fit oversized content, so both grew together. The page also clips sideways overflow, so nothing ever scrolled. The overflow check now:
+
+- Compares against the real screen width.
+- Measures each heading's letters as well as its box.
+- Reports cut-off text.
+- Flags a widened layout.
+
+It runs on every page at 11 widths from 320 to 1440 px. Run against the earlier live version, it flags the clipped titles; on the fixed version it finds nothing.
+
 ## Not covered
 
 - Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.
 - A walkthrough with a screen reader (VoiceOver or TalkBack). The automated checks cover names, roles, focus and contrast, but not how the pages sound read aloud.
-- Lighthouse on the live GitHub Pages address. GitHub's own hosting doesn't send the security headers above; those apply when the site runs on its own Node server.
+- Security headers on GitHub Pages. GitHub's own hosting doesn't send the headers listed in audit 5; those apply when the site runs on its own Node server.
