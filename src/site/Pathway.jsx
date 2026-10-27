@@ -1,4 +1,5 @@
 import { academy } from '../../shared/academy.js'
+import { BookVisit } from './BookVisit'
 import { SectionTitle } from './SectionTitle'
 
 export function Pathway() {
@@ -23,6 +24,7 @@ export function Pathway() {
             </li>
           ))}
         </ol>
+        <BookVisit note="The first step is the training ground: weekday evenings, 6 to 9 PM." />
       </div>
     </section>
   )

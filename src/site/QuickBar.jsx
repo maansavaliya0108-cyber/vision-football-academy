@@ -43,9 +43,8 @@ export function QuickBar({ path }) {
         <span className="quickbar__label">WhatsApp</span>
       </a>
       <Link className="quickbar__join" to={joinTarget(path)} tabIndex={shown ? 0 : -1}>
-        <span>
-          Join<span className="join-more"> the academy</span>
-        </span>
+        <span className="cta-long">Book a visit</span>
+        <span className="cta-short">Visit</span>
       </Link>
     </nav>
   )

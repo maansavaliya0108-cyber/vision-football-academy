@@ -4,7 +4,7 @@ import { Method } from '../site/Method'
 import { Pathway } from '../site/Pathway'
 import { Reputation } from '../site/Reputation'
 import { SectionTitle } from '../site/SectionTitle'
-import { CtaBand, PageHero } from './PageHero'
+import { PageHero } from './PageHero'
 
 export default function MethodPage() {
   const { philosophy } = academy
@@ -12,7 +12,7 @@ export default function MethodPage() {
     <>
       <PageHero crumbs={[{ label: 'The method' }]} title={philosophy.name} lede={philosophy.summary}>
         <Link className="btn btn--volt" to="/visit#join">
-          Join the academy
+          Book a visit
         </Link>
         <Link className="btn btn--ghost" to="/programs">
           See the programs
@@ -52,7 +52,6 @@ export default function MethodPage() {
       <Method />
       <Pathway />
       <Reputation />
-      <CtaBand title="See it on the pitch" body="Sessions run Monday to Friday, 6 to 9 PM, at Boghara School Ground, Adajan." />
     </>
   )
 }

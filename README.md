@@ -23,18 +23,22 @@ Each page has its own title, description, canonical link and share preview, writ
 
 ## The home page
 
+The home page is built like a pitch, ending in one low-commitment step: **Book a visit**. Every claim on it is a confirmed fact from `shared/academy.js`. It implies the academy is the one to choose through proof (ratings, the method, the pathway), never by calling itself the best.
+
 | Section | What it does |
 | --- | --- |
 | Opening scroll story | A short film you scroll through, made of 26,000 particles of light (16,000 on phones). They pour in and form a spinning football (which scatters from your cursor). The camera dives into the ball as it bursts with a shockwave, then pulls back as the cloud builds the word THINK. letter by letter. The word melts into ribbons that draw the pitch, then the camera cranes up for the tactical picture: the pressed player, the blocked passes, the open one. It drops to the turf and rides alongside the pass in slow motion as a light sweeps the pitch, then pulls back while everything locks into the VISION wordmark with a flash. Particles leave light trails while they move, and out-of-focus points blur like a camera lens. The headlines rise in word by word. |
+| At a glance | The proof, straight after the story: 5.0 on Google (53+ reviews), 5.0 on Justdial, five evenings a week, five programs, four areas in every session |
+| Why families choose Vision | Six reasons, each one a confirmed fact (the method, the four areas, the match pathway, the program range, confidence for every player, International Immersion), closing with Book a visit or call |
 | Every session covers four things | Technical, Physical, Tactical and Mental, laid out as the four quarters of a pitch |
 | Five ways to train | The five programs as a team sheet. "Enquire about…" pre-fills the form. |
-| Match time is the measure | The pathway from training ground to state scouts |
-| What Surat families say | Google and Justdial ratings plus the themes that come up in reviews |
+| Match time is the measure | The pathway from training ground to state scouts, closing with Book a visit |
+| What Surat families say | Google and Justdial ratings plus the themes that come up in reviews, closing with Book a visit |
 | Timings and ground | Weekly timings with a live "Training now / Next session" badge (always in IST), map, directions, call and WhatsApp |
-| Questions parents ask | Six answers built only from confirmed facts, also published as FAQ structured data for search engines |
-| Join the academy | Enquiry form. Saves to the database and gives the parent a reference such as `VFA-7KQ2M`. |
+| Questions parents ask | Seven answers built only from confirmed facts (including what makes the coaching different), also published as FAQ structured data for search engines |
+| Book a visit | The booking form, with the Google rating beside it. Only four things are required (name, age, mobile, program); everything else sits under "Add details (optional)". It saves to the database and gives the parent a reference such as `VFA-7KQ2M`. |
 
-On phones, a Call / WhatsApp / Join bar stays at the bottom of the screen once the hero has scrolled away, and the programs become an accordion.
+On phones, a Call / WhatsApp / Book a visit bar stays at the bottom of the screen once the hero has scrolled away, and the programs become an accordion.
 
 ### The opening film
 
@@ -126,7 +130,7 @@ Everything the site says about the academy is in [`shared/academy.js`](shared/ac
 
 The particle formations (ball, the word, pitch, the play, wordmark) are built in [`src/three/shapes.js`](src/three/shapes.js); when each one appears as you scroll is set in [`src/three/timeline.js`](src/three/timeline.js). The camera's shots are the `SHOTS` list in [`src/three/ParticleCanvas.jsx`](src/three/ParticleCanvas.jsx), and the timed moments (the burst, the slow-motion pass, the landing) are in [`src/three/director.js`](src/three/director.js). On slower devices the scene steps itself down (fewer light trails, then no glow); with reduced motion turned on there are no trails, shakes or camera dives.
 
-The share image (`public/og.png`, shown when the link is posted on WhatsApp, Instagram or X) is a capture of the live hero. With the dev server running and Google Chrome installed:
+The share image (`public/og.png`, shown when the link is posted on WhatsApp, Instagram or X) is the opening film's brand card: VISION under the floodlights, with the place and timings beneath. With the dev server running and Google Chrome installed:
 
 ```bash
 npm run og

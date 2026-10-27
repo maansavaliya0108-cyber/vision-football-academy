@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { academy } from '../../shared/academy.js'
+import { Link } from '../router'
 import { Enquiry } from '../site/Enquiry'
 import { Faq } from '../site/Faq'
 import { Visit } from '../site/Visit'
@@ -11,15 +12,15 @@ export default function VisitPage() {
     <>
       <PageHero
         crumbs={[{ label: 'Timings and ground' }]}
-        title="Find us at the ground"
-        lede={`${academy.address.venue}, Adajan, Surat. Training runs Monday to Friday from 6 to 9 PM. Come and watch a session, or send an enquiry first.`}
+        title="See it for yourself"
+        lede={`${academy.address.venue}, Adajan, Surat. Training runs Monday to Friday, 6 to 9 PM. Book a visit and the academy will call you back to arrange it.`}
         marks={[[100, 150]]}
       >
-        <a className="btn btn--volt" href={academy.maps.directions} target="_blank" rel="noreferrer">
+        <Link className="btn btn--volt" to="#join">
+          Book a visit
+        </Link>
+        <a className="btn btn--ghost" href={academy.maps.directions} target="_blank" rel="noreferrer">
           Get directions
-        </a>
-        <a className="btn btn--ghost" href={`tel:${academy.phone.tel}`}>
-          Call {academy.phone.display}
         </a>
       </PageHero>
       <Visit />

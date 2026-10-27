@@ -149,8 +149,8 @@ export function Programs({ onEnquire }) {
     <>
       <SectionTitle id="programs-title">Five ways to train</SectionTitle>
       <p className="programs__intro">
-        From a first kickabout to an overseas pathway. Not sure which fits? Send an enquiry and the academy will help
-        you choose.
+        Whatever the level, there is a clear next step: from a pressure-free first kickabout to squad football and an
+        overseas pathway. Not sure which fits? Book a visit and the academy will help you choose.
       </p>
     </>
   )

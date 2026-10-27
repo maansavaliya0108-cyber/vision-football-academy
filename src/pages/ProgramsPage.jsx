@@ -15,7 +15,7 @@ export default function ProgramsPage() {
         lede="From a first kickabout to an overseas pathway. All weekday training is at Boghara School Ground, Monday to Friday, 6 to 9 PM."
       >
         <Link className="btn btn--volt" to="/visit#join">
-          Join the academy
+          Book a visit
         </Link>
         <Link className="btn btn--ghost" to="/method">
           How sessions work

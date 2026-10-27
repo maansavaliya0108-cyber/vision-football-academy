@@ -1,4 +1,5 @@
 import { academy } from '../../shared/academy.js'
+import { BookVisit } from './BookVisit'
 import { Stars } from './icons'
 import { SectionTitle } from './SectionTitle'
 
@@ -39,6 +40,7 @@ export function Reputation() {
         <a className="text-link" href={academy.maps.directions} target="_blank" rel="noreferrer">
           Read the reviews on Google Maps
         </a>
+        <BookVisit tone="ink" />
       </div>
     </section>
   )

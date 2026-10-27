@@ -200,6 +200,35 @@ The fixes:
 
 It runs on every page at 11 widths from 320 to 1440 px. Run against the earlier live version, it flags the clipped titles; on the fixed version it finds nothing.
 
+## Marketing pass: facts only
+
+The site was rewritten to sell, not just inform. One rule held throughout: **every claim is a confirmed fact from `shared/academy.js`.** The academy is never called the best. The case is made by proof:
+
+- The 5.0 ratings on Google (53+ reviews) and Justdial.
+- The method.
+- The four areas in every session.
+- The pathway to district trials and state scouts.
+- The program range.
+- What parents' reviews keep saying.
+
+**What changed:**
+
+- **Home:** a proof bar straight after the story, then "Why families choose Vision" (six reasons). "Book a visit" closes the persuasive sections.
+- **Calls to action:** one low-commitment step everywhere, "Book a visit".
+- **The form:** only name, age, mobile and program are required; the rest is optional. The rating sits beside it, with a reassurance line under the button.
+- **Copy and meta:** page titles and descriptions lead with the rating, and a new FAQ answers "What makes the coaching different?".
+- **Share image:** now the film's brand card.
+
+**Checks:**
+
+- **Claim words:** all site copy was searched for words that would need proof the academy hasn't given (best, top-rated, leading, number one, free, certified, licensed, guarantee, expert, world-class, state-of-the-art). The only hits were "pressure-free" and "kept free for tournaments".
+- **The booking flow:**
+  - An empty submit flags only the essentials.
+  - A mistake inside the optional details opens them and focuses the field.
+  - An essentials-only booking is saved with a reference.
+  - The dashboard shows experience as "Not given".
+- **The full regression pass** still runs clean at three sizes: one h1 per page, never wider than the screen, 0 axe violations, and the 320 px menu and booking buttons work.
+
 ## Not covered
 
 - Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.

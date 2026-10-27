@@ -146,12 +146,45 @@ export const academy = {
   ],
 }
 
+// Why families choose the academy. Each point restates facts from above (the method, the four
+// areas, the pathway, the programs, the review themes); nothing here is new information.
+academy.reasons = [
+  {
+    title: 'Players who think for themselves',
+    body: 'Coaches set the problem and players work out the answer, so they learn to read the game instead of waiting for a shout from the sideline.',
+  },
+  {
+    title: 'A complete footballer, every session',
+    body: 'Every session works on all four areas: technique, match conditioning, game awareness and resilience under pressure.',
+  },
+  {
+    title: 'Real matches, in front of scouts',
+    body: 'Registered players go forward for district selection trials, corporate youth cups and regional leagues, where consistent performances reach state-level scouts.',
+  },
+  {
+    title: 'A next step for every level',
+    body: 'From a pressure-free first kickabout to squad football, 1-on-1 sessions and specialist goalkeeping.',
+  },
+  {
+    title: 'Confidence for every player',
+    body: 'The theme parents’ reviews keep coming back to: coaches put real work into every player, not just the advanced ones.',
+  },
+  {
+    title: 'A pathway beyond Surat',
+    body: 'The academy’s top talents can be selected for International Immersion: overseas training methods and international competition.',
+  },
+]
+
 // Questions parents ask before joining. Answers only use facts stated elsewhere in this file;
 // anything not confirmed (fees, exact age groups) points people to the phone instead.
 academy.faq = [
   {
     q: 'When and where is training?',
     a: `Monday to Friday, 6 PM to 9 PM, on the outdoor turf at ${academy.address.venue}, Adajan, Surat. There are no sessions at weekends, which are kept free for tournaments, league fixtures and recovery.`,
+  },
+  {
+    q: 'What makes the coaching different?',
+    a: `${academy.philosophy.name}. Instead of rigid drills where players only follow instructions, coaches set problems for players to solve, so they learn to read the game, make quick decisions and think ahead of the ball. Every session also covers technique, match conditioning, game awareness and resilience under pressure.`,
   },
   {
     q: 'My child has never played properly. Is that OK?',
@@ -171,7 +204,7 @@ academy.faq = [
   },
   {
     q: 'How do we join, and what are the fees?',
-    a: `Send an enquiry with the form on this page, or call or WhatsApp ${academy.phone.display}. The academy will talk you through programs and fees and arrange a visit to the ground.`,
+    a: `Book a visit with the form on this page, or call or WhatsApp ${academy.phone.display}. The academy will talk you through programs and fees and arrange a visit to the ground.`,
   },
 ]
 

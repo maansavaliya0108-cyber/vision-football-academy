@@ -1,7 +1,7 @@
 import { useId, useRef, useState } from 'react'
 import { academy, experienceLevels } from '../../shared/academy.js'
 import { STATIC } from '../config'
-import { ChatIcon, PhoneIcon, TickIcon } from './icons'
+import { ChatIcon, PhoneIcon, Stars, TickIcon } from './icons'
 import { SectionTitle } from './SectionTitle'
 
 const empty = {
@@ -28,10 +28,12 @@ function validate(v) {
   if (!/^[6-9]\d{9}$/.test(digits)) e.phone = 'Enter a 10-digit Indian mobile number'
   if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) e.email = 'Enter a valid email address or leave it blank'
   if (!v.program) e.program = 'Choose a program'
-  if (!v.experience) e.experience = 'Choose the player’s experience'
   if (!v.consent) e.consent = 'Tick the box so the academy can call you back'
   return e
 }
+
+// Asked for only if the parent opens “Add details”: the academy can ask the rest on the call.
+const OPTIONAL = ['guardianName', 'experience', 'email', 'preferredDay', 'message']
 
 function Field({ id, label, hint, error, children, wide }) {
   return (
@@ -56,6 +58,7 @@ export function Enquiry({ program, onProgramChange }) {
   const [values, setValues] = useState(empty)
   const [errors, setErrors] = useState({})
   const [state, setState] = useState({ phase: 'idle' })
+  const [more, setMore] = useState(false)
   const form = useRef(null)
   const uid = useId()
   const id = (name) => `${uid}-${name}`
@@ -76,7 +79,10 @@ export function Enquiry({ program, onProgramChange }) {
     const found = validate(all)
     setErrors(found)
     if (Object.keys(found).length) {
-      form.current.querySelector(`[name="${Object.keys(found)[0]}"]`)?.focus()
+      const first = Object.keys(found)[0]
+      // A mistake in the optional details opens them, so the field can be seen and fixed.
+      if (OPTIONAL.includes(first)) setMore(true)
+      requestAnimationFrame(() => form.current?.querySelector(`[name="${first}"]`)?.focus())
       return
     }
     if (STATIC) {
@@ -90,7 +96,7 @@ export function Enquiry({ program, onProgramChange }) {
         `Mobile: ${all.phone}`,
         all.email.trim() && `Email: ${all.email.trim()}`,
         `Program: ${program}`,
-        `Experience: ${experience}`,
+        experience && `Experience: ${experience}`,
         `Best day to visit: ${all.preferredDay}`,
         all.message.trim() && `Note: ${all.message.trim()}`,
       ].filter(Boolean)
@@ -110,7 +116,10 @@ export function Enquiry({ program, onProgramChange }) {
         setState({ phase: 'sent', ref: data.ref, playerName: all.playerName.trim(), phone: all.phone })
         return
       }
-      if (data.fields) setErrors(data.fields)
+      if (data.fields) {
+        setErrors(data.fields)
+        if (Object.keys(data.fields).some((k) => OPTIONAL.includes(k))) setMore(true)
+      }
       setState({ phase: 'error', message: data.error || 'The enquiry did not go through. Try again, or call the academy.' })
     } catch {
       setState({
@@ -126,16 +135,23 @@ export function Enquiry({ program, onProgramChange }) {
     setState({ phase: 'idle' })
   }
 
+  const google = academy.ratings.find((r) => r.source === 'Google')
   const whatsapp = (text) => `https://wa.me/${academy.phone.whatsapp}?text=${encodeURIComponent(text)}`
 
   return (
     <section className="join" id="join" aria-labelledby="join-title">
       <div className="wrap join__grid">
         <div className="join__intro">
-          <SectionTitle id="join-title">Join the academy</SectionTitle>
+          <SectionTitle id="join-title">Book a visit</SectionTitle>
           <p>
-            Tell us about the player and the academy will call you back to talk through programs and arrange a visit
-            to the ground.
+            See a session at {academy.address.venue} for yourself. Leave the player’s details and the academy will
+            call you back to talk through programs and fees and arrange your visit.
+          </p>
+          <p className="join__proof">
+            <Stars size={15} />
+            <span>
+              <strong>{google.score.toFixed(1)}</strong> on Google, from {google.countLabel}
+            </span>
           </p>
           <div className="join__direct">
             <p>Prefer to talk now?</p>
@@ -155,11 +171,12 @@ export function Enquiry({ program, onProgramChange }) {
             <span className="sent__icon">
               <TickIcon width={28} height={28} />
             </span>
-            <h3>{state.ref ? 'Enquiry sent' : 'Almost there'}</h3>
+            <h3>{state.ref ? 'Visit requested' : 'Almost there'}</h3>
             {state.ref ? (
               <p>
-                Thanks. The academy will call you on <strong>{state.phone}</strong> about {state.playerName}. Your
-                reference is <strong className="sent__ref">{state.ref}</strong>.
+                Thanks. The academy will call you on <strong>{state.phone}</strong> about {state.playerName} to talk
+                through programs and fees and arrange your visit. Your reference is{' '}
+                <strong className="sent__ref">{state.ref}</strong>.
               </p>
             ) : (
               <p>
@@ -206,22 +223,7 @@ export function Enquiry({ program, onProgramChange }) {
                 aria-describedby={describe('playerAge')}
               />
             </Field>
-            <Field
-              id={id('guardianName')}
-              label="Parent or guardian (optional)"
-              hint="Leave blank if the player is an adult."
-              error={errors.guardianName}
-            >
-              <input
-                id={id('guardianName')}
-                name="guardianName"
-                autoComplete="name"
-                value={values.guardianName}
-                onChange={set('guardianName')}
-                aria-describedby={describe('guardianName', true)}
-              />
-            </Field>
-            <Field id={id('phone')} label="Mobile number" hint="The academy will call this number." error={errors.phone}>
+            <Field id={id('phone')} label="Mobile number" error={errors.phone}>
               <input
                 id={id('phone')}
                 name="phone"
@@ -232,7 +234,7 @@ export function Enquiry({ program, onProgramChange }) {
                 value={values.phone}
                 onChange={set('phone')}
                 aria-invalid={Boolean(errors.phone)}
-                aria-describedby={describe('phone', true)}
+                aria-describedby={describe('phone')}
               />
             </Field>
             <Field id={id('program')} label="Program" error={errors.program}>
@@ -254,55 +256,74 @@ export function Enquiry({ program, onProgramChange }) {
                 ))}
               </select>
             </Field>
-            <Field id={id('experience')} label="Experience" error={errors.experience}>
-              <select
-                id={id('experience')}
-                name="experience"
-                value={values.experience}
-                onChange={set('experience')}
-                aria-invalid={Boolean(errors.experience)}
-                aria-describedby={describe('experience')}
-              >
-                <option value="" disabled>
-                  Choose one
-                </option>
-                {experienceLevels.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field id={id('email')} label="Email (optional)" error={errors.email}>
-              <input
-                id={id('email')}
-                name="email"
-                type="email"
-                autoComplete="email"
-                value={values.email}
-                onChange={set('email')}
-                aria-invalid={Boolean(errors.email)}
-                aria-describedby={describe('email')}
-              />
-            </Field>
-            <Field id={id('preferredDay')} label="Best day to visit">
-              <select id={id('preferredDay')} name="preferredDay" value={values.preferredDay} onChange={set('preferredDay')}>
-                {['Any weekday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d) => (
-                  <option key={d}>{d}</option>
-                ))}
-              </select>
-            </Field>
-            <Field id={id('message')} label="Anything the coaches should know? (optional)" wide error={errors.message}>
-              <textarea
-                id={id('message')}
-                name="message"
-                rows={3}
-                maxLength={1000}
-                placeholder="Position, injuries, goals, questions about fees"
-                value={values.message}
-                onChange={set('message')}
-              />
-            </Field>
+            {/* Only the essentials are required; the academy can ask the rest on the call. */}
+            <details className="form__more" open={more} onToggle={(e) => setMore(e.currentTarget.open)}>
+              <summary>Add details (optional)</summary>
+              <div className="form__more-grid">
+                <Field
+                  id={id('guardianName')}
+                  label="Parent or guardian"
+                  hint="Leave blank if the player is an adult."
+                  error={errors.guardianName}
+                >
+                  <input
+                    id={id('guardianName')}
+                    name="guardianName"
+                    autoComplete="name"
+                    value={values.guardianName}
+                    onChange={set('guardianName')}
+                    aria-describedby={describe('guardianName', true)}
+                  />
+                </Field>
+                <Field id={id('experience')} label="Experience" error={errors.experience}>
+                  <select
+                    id={id('experience')}
+                    name="experience"
+                    value={values.experience}
+                    onChange={set('experience')}
+                    aria-invalid={Boolean(errors.experience)}
+                    aria-describedby={describe('experience')}
+                  >
+                    <option value="">Choose one</option>
+                    {experienceLevels.map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.label}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field id={id('email')} label="Email" error={errors.email}>
+                  <input
+                    id={id('email')}
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    value={values.email}
+                    onChange={set('email')}
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={describe('email')}
+                  />
+                </Field>
+                <Field id={id('preferredDay')} label="Best day to visit">
+                  <select id={id('preferredDay')} name="preferredDay" value={values.preferredDay} onChange={set('preferredDay')}>
+                    {['Any weekday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map((d) => (
+                      <option key={d}>{d}</option>
+                    ))}
+                  </select>
+                </Field>
+                <Field id={id('message')} label="Anything the coaches should know?" wide error={errors.message}>
+                  <textarea
+                    id={id('message')}
+                    name="message"
+                    rows={3}
+                    maxLength={1000}
+                    placeholder="Position, injuries, goals, questions about fees"
+                    value={values.message}
+                    onChange={set('message')}
+                  />
+                </Field>
+              </div>
+            </details>
             <div className="field--trap" aria-hidden="true">
               <label htmlFor={id('website')}>Leave this empty</label>
               <input id={id('website')} name="website" tabIndex={-1} autoComplete="off" value={values.website} onChange={set('website')} />
@@ -332,8 +353,9 @@ export function Enquiry({ program, onProgramChange }) {
             )}
             <div className="form__submit">
               <button className="btn btn--volt" type="submit" disabled={state.phase === 'sending'}>
-                {state.phase === 'sending' ? 'Sending enquiry' : STATIC ? 'Send on WhatsApp' : 'Send enquiry'}
+                {state.phase === 'sending' ? 'Sending' : STATIC ? 'Book on WhatsApp' : 'Book my visit'}
               </button>
+              <p className="form__reassure">Takes under a minute. No commitment: the academy calls you back first.</p>
             </div>
           </form>
         )}

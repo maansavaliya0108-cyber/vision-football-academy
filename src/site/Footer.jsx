@@ -5,12 +5,15 @@ import { Logo } from './Logo'
 
 export function Footer() {
   const { address, phone } = academy
+  const google = academy.ratings.find((r) => r.source === 'Google')
   return (
     <footer className="footer">
       <div className="wrap footer__grid">
         <div className="footer__brand">
           <Logo />
-          <p>Evening football coaching for young players in Adajan, Surat.</p>
+          <p>
+            Rated {google.score.toFixed(1)} by Surat families. Evening football coaching in Adajan, Monday to Friday.
+          </p>
         </div>
         <nav aria-label="Footer">
           <h2 className="footer__title">Explore</h2>
@@ -28,7 +31,7 @@ export function Footer() {
               <Link to="/visit#faq">Questions</Link>
             </li>
             <li>
-              <Link to="/visit#join">Join the academy</Link>
+              <Link to="/visit#join">Book a visit</Link>
             </li>
           </ul>
         </nav>

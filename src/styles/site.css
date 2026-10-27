@@ -259,10 +259,16 @@
     font-size: 0.82rem;
   }
 }
+.cta-short {
+  display: none;
+}
 @media (max-width: 374px) {
-  /* The smallest phones fit "Join" in the nav and the quick bar, but not the full label. */
-  .join-more {
+  /* The smallest phones fit the short label in the nav and the quick bar. */
+  .cta-long {
     display: none;
+  }
+  .cta-short {
+    display: inline;
   }
 }
 
@@ -2807,5 +2813,223 @@
 @media (prefers-reduced-motion: reduce) {
   .hero__film {
     display: none;
+  }
+}
+
+/* ---------- Proof bar: the academy at a glance, straight after the story ---------- */
+
+.proof {
+  background: var(--void);
+  padding-block: clamp(3rem, 6vw, 5rem);
+  border-bottom: 1px solid var(--line);
+}
+.proof__list {
+  list-style: none;
+  margin-block: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.proof__item {
+  display: grid;
+  align-content: start;
+  gap: 0.55rem;
+  padding-inline: clamp(1rem, 2vw, 2rem);
+  border-left: 1px solid var(--line);
+}
+.proof__item:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.proof__value {
+  font-weight: 900;
+  font-stretch: 125%;
+  font-size: clamp(2.6rem, 1.6rem + 3vw, 4.6rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.proof__label {
+  max-width: 15rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--smoke);
+}
+@media (max-width: 900px) {
+  .proof__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem 1.25rem;
+  }
+  .proof__item {
+    padding: 0;
+    border-left: 0;
+  }
+  .proof__item:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ---------- Why families choose Vision ---------- */
+
+.why {
+  background: var(--bone);
+  color: var(--ink);
+  color-scheme: light;
+  padding-block: clamp(5.5rem, 11vw, 10rem);
+}
+.why__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 1.5rem 4rem;
+  align-items: end;
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+.why__intro {
+  max-width: 30rem;
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--ink-soft);
+}
+.why__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(2.25rem, 4vw, 3.5rem) clamp(1.5rem, 3vw, 3rem);
+}
+.why__item {
+  display: grid;
+  align-content: start;
+  gap: 0.9rem;
+  padding-top: 1.4rem;
+  border-top: 2px solid var(--ink);
+}
+.why__num {
+  display: inline-grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--volt);
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+.why__title {
+  font-size: var(--step-2);
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+.why__body {
+  max-width: 26rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+}
+@media (max-width: 900px) {
+  .why__head {
+    grid-template-columns: 1fr;
+  }
+  .why__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .why__list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- "Book a visit" rows that close persuasive sections ---------- */
+
+.book {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem 1.75rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+.book__call {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  color: inherit;
+  text-decoration: none;
+}
+.book__call:hover {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.book__note {
+  flex-basis: 100%;
+  font-size: 0.92rem;
+  color: var(--smoke);
+}
+.book--ink .book__note {
+  color: var(--ink-soft);
+}
+
+/* ---------- Booking form: proof at the point of decision, essentials first ---------- */
+
+.join__intro > .join__proof {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  font-size: 0.95rem;
+}
+.join__proof strong {
+  color: var(--bone);
+}
+.form__more {
+  grid-column: 1 / -1;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+.form__more summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  list-style: none;
+  font-weight: 700;
+  color: var(--smoke);
+  cursor: pointer;
+}
+.form__more summary::-webkit-details-marker {
+  display: none;
+}
+.form__more summary::before {
+  content: '+';
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.25s var(--ease-out);
+}
+.form__more[open] summary::before {
+  transform: rotate(45deg);
+}
+.form__more summary:hover {
+  color: var(--bone);
+}
+.form__more-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+.form__reassure {
+  margin-top: 0.85rem;
+  font-size: 0.88rem;
+  color: var(--smoke);
+}
+@media (max-width: 560px) {
+  .form__more-grid {
+    grid-template-columns: 1fr;
   }
 }

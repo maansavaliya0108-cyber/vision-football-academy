@@ -53,7 +53,8 @@ export function createEnquiry(e) {
     e.phone,
     e.email || null,
     e.program,
-    e.experience,
+    // The column predates experience being optional, so "not given" is stored as an empty string.
+    e.experience || '',
     e.preferredDay || null,
     e.message || null,
   )

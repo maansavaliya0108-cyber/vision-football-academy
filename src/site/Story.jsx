@@ -130,12 +130,13 @@ export function Story() {
         <div className="hero">
           <div className="hero__intro">
             <p className="hero__lede">
-              Evening football coaching in Adajan, Surat. Players learn to read the game and make their own
-              decisions, instead of waiting for a shout from the sideline.
+              The football academy Surat families rate {google.score.toFixed(1)}. Every weekday evening in Adajan,
+              players learn to read the game and make their own decisions, instead of waiting for a shout from the
+              sideline.
             </p>
             <div className="hero__actions">
               <a className="btn btn--volt" href="#join">
-                Join the academy
+                Book a visit
               </a>
               <a className="btn btn--ghost" href={`tel:${academy.phone.tel}`}>
                 <PhoneIcon width={18} height={18} />

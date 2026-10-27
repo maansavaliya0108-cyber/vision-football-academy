@@ -129,7 +129,7 @@ function Row({ e, onSave }) {
               </div>
               <div>
                 <dt>Experience</dt>
-                <dd>{experienceName[e.experience] || e.experience}</dd>
+                <dd>{experienceName[e.experience] || e.experience || 'Not given'}</dd>
               </div>
               <div>
                 <dt>Best day</dt>
@@ -272,7 +272,7 @@ function Dashboard({ onSignOut }) {
             <p>
               {status || q
                 ? 'Try another status or clear the search.'
-                : 'Enquiries sent from the “Join the academy” form on the website will appear here.'}
+                : 'Enquiries sent from the “Book a visit” form on the website will appear here.'}
             </p>
           </div>
         ) : (

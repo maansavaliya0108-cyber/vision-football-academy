@@ -28,10 +28,11 @@ export const enquirySchema = z.object({
     .optional()
     .transform((v) => v || undefined),
   program: z.enum(programIds, { error: 'Choose a program' }),
-  experience: z.enum(
-    experienceLevels.map((l) => l.id),
-    { error: 'Choose the player’s experience' },
-  ),
+  // Optional: the form keeps it under “Add details”, and the academy can ask on the call.
+  experience: z
+    .union([z.literal(''), z.enum(experienceLevels.map((l) => l.id), { error: 'Choose the player’s experience' })])
+    .optional()
+    .transform((v) => v || undefined),
   preferredDay: z
     .enum(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Any weekday'])
     .optional(),

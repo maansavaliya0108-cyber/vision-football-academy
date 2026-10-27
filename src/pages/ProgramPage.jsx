@@ -29,7 +29,7 @@ export default function ProgramPage({ id }) {
         marks={[[100, 196], [128, 110], [62, 150], [150, 236]].slice(0, 2 + (index % 3))}
       >
         <Link className="btn btn--volt" to="#join">
-          Enquire about this program
+          Book a visit
         </Link>
         <a className="btn btn--ghost" href={`tel:${academy.phone.tel}`}>
           Call {academy.phone.display}

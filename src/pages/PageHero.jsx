@@ -57,9 +57,9 @@ export function PageHero({ crumbs = [], title, lede, children, marks = [[100, 19
 }
 
 /** A full-width call to action band that closes most pages. */
-export function CtaBand({ title = 'Come and see a session', body, to = '/visit#join', label = 'Join the academy' }) {
+export function CtaBand({ title = 'See it for yourself', body, to = '/visit#join', label = 'Book a visit' }) {
   return (
-    <section className="cta-band" aria-label="Join the academy">
+    <section className="cta-band" aria-label="Book a visit">
       <div className="wrap cta-band__inner">
         <h2 className="cta-band__title">{title}</h2>
         {body && <p className="cta-band__body">{body}</p>}
