@@ -36,6 +36,28 @@ Each page has its own title, description, canonical link and share preview, writ
 
 On phones, a Call / WhatsApp / Join bar stays at the bottom of the screen once the hero has scrolled away, and the programs become an accordion.
 
+### The opening film
+
+An eight-second promo, cut like a sports-brand ad, opens the site on a first visit:
+
+1. **The open:** two stadium floodlight banks flicker on in the dark, inside letterbox bars.
+2. **The cards** cut in one after another:
+   - 01 The method: "They don't wait for the shout."
+   - 02 The edge: "They see it first." A streak of light whips across.
+   - 03 The verdict: 5.0 and five stars, rated by Surat families, 53+ reviews on Google.
+   - 04 The pathway: training ground, district trials, state scouts.
+3. **The brand:** VISION, Football Academy, Adajan, Surat. Beneath it: Monday to Friday, 6 to 9 PM, outdoor turf.
+4. **The handover:** the streak spirals into the spot where the 3D ball forms, the bars retract, the particles fly in, and the headline settles into focus.
+
+Every line comes from `shared/academy.js`; there are no claims beyond the academy's confirmed facts.
+
+- **When it plays:** once per visitor, remembered in the browser. Never for links to a section such as `/#join`, never when arriving from another page, and never with reduced motion turned on.
+- **Skipping:** the Skip intro button, any key, a click, or a scroll.
+- **Watching again:** "Play the film" in the hero.
+- **Sharing:** add `?film` to the address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?film`. That link always opens with the film, which makes it a good one for WhatsApp and Instagram.
+
+It lives in [`src/site/Opener.jsx`](src/site/Opener.jsx) (timing, the light streaks) and the "The film" section of [`src/styles/site.css`](src/styles/site.css) (cards, lights, letterbox). The two share one clock, so change their timings together.
+
 ## Run it locally
 
 Needs Node.js 22.13 or newer.

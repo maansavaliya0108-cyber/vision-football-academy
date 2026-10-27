@@ -318,12 +318,13 @@ function Formation({ count, trails, onReady }) {
   useFrame((state, dt) => {
     const u = uniforms
     const d = director
-    // The intro starts with the first frame that actually has particles in it.
+    // The intro starts with the first frame that actually has particles in it (or, while the
+    // opening film plays, once it hands over).
     if (geometry && !ready.current) {
       ready.current = true
-      storyState.introAt = performance.now()
       onReady?.()
     }
+    if (ready.current && storyState.introAt == null && !storyState.holdIntro) storyState.introAt = performance.now()
     u.uStage.value = d.stage
     u.uTime.value = d.time
     u.uStream.value = d.stream

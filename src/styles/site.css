@@ -398,6 +398,26 @@
     animation: fade-in 1s 0.5s ease both;
   }
 }
+/* After the opening film, the headline settles into focus as the scene takes over. */
+.film-handover .hero__word {
+  animation: word-settle 1.3s var(--ease-out) both;
+}
+.film-handover .hero__word:nth-child(2) {
+  animation-delay: 0.08s;
+}
+.film-handover .hero__word:nth-child(3) {
+  animation-delay: 0.16s;
+}
+.film-handover .hero__word:nth-child(4) {
+  animation-delay: 0.24s;
+}
+@keyframes word-settle {
+  from {
+    opacity: 0.25;
+    filter: blur(10px);
+    transform: translateY(0.25em);
+  }
+}
 @keyframes word-in {
   from {
     opacity: 0;
@@ -2385,4 +2405,407 @@
   letter-spacing: -0.02em;
   text-transform: uppercase;
   max-width: 28ch;
+}
+
+/* ---------- The film: an eight-second promo before the scroll story ----------
+   Every delay below is seconds from the start, on the same clock as Opener.jsx. */
+
+.film {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  background-color: #030304;
+  animation: film-reveal 0.85s 7.15s ease forwards;
+}
+.film.is-leaving {
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.film__frame,
+.film__canvas,
+.film__haze {
+  position: absolute;
+  inset: 0;
+}
+.film__canvas {
+  width: 100%;
+  height: 100%;
+}
+@keyframes film-reveal {
+  to {
+    background-color: rgba(3, 3, 4, 0);
+  }
+}
+@keyframes film-in {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes film-out {
+  to {
+    opacity: 0;
+  }
+}
+
+/* Letterbox bars, retracting as the film hands over to the site. */
+.film__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  height: 11vh;
+  background: #000;
+  animation: film-bar 0.7s 7.15s var(--ease-out) forwards;
+}
+.film__bar--top {
+  top: 0;
+  transform-origin: top;
+}
+.film__bar--bottom {
+  bottom: 0;
+  transform-origin: bottom;
+}
+@keyframes film-bar {
+  to {
+    transform: scaleY(0);
+  }
+}
+
+/* Stadium floodlight banks: they flicker on one after the other and throw soft beams through haze. */
+.film__haze {
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 105%, rgba(242, 242, 230, 0.08), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 12% 18%, rgba(242, 242, 230, 0.06), transparent 70%),
+    radial-gradient(ellipse 40% 50% at 88% 18%, rgba(242, 242, 230, 0.06), transparent 70%);
+  opacity: 0;
+  animation: film-in 1s 0.3s forwards, film-out 0.6s 6.9s forwards;
+}
+.film__light {
+  position: absolute;
+  top: 15vh;
+  width: clamp(4.5rem, 9vw, 8rem);
+  animation: film-out 0.6s 6.9s forwards;
+}
+.film__light--left {
+  left: 6vw;
+}
+.film__light--right {
+  right: 6vw;
+}
+.film__flicker {
+  position: relative;
+  opacity: 0;
+  animation: film-flicker 0.8s 0.15s linear forwards;
+}
+.film__light--right .film__flicker {
+  animation-delay: 0.4s;
+}
+@keyframes film-flicker {
+  0% { opacity: 0; }
+  6% { opacity: 1; }
+  12% { opacity: 0.15; }
+  20% { opacity: 1; }
+  30% { opacity: 0.45; }
+  38%, 100% { opacity: 1; }
+}
+.film__lamps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.3rem;
+  padding: 0.35rem;
+  border-radius: 4px;
+  background: #101012;
+}
+.film__lamps span {
+  aspect-ratio: 5 / 3;
+  border-radius: 2px;
+  background: #fffef4;
+  box-shadow:
+    0 0 10px 2px rgba(255, 255, 240, 0.75),
+    0 0 36px 10px rgba(255, 255, 230, 0.22);
+}
+.film__beam {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70vw;
+  height: 115vh;
+  transform-origin: top center;
+  transform: translateX(-50%) rotate(-30deg);
+  /* Soft volumetric light: bright at the lamp, gone well before the ground. */
+  background: radial-gradient(ellipse 50% 100% at 50% 0%, rgba(242, 242, 230, 0.16), rgba(242, 242, 230, 0.04) 45%, transparent 75%);
+  clip-path: polygon(46% 0, 54% 0, 100% 100%, 0 100%);
+  filter: blur(26px);
+  pointer-events: none;
+}
+.film__light--right .film__beam {
+  transform: translateX(-50%) rotate(30deg);
+}
+/* An anamorphic flare: the long horizontal streak a cinema lens draws from a bright light. */
+.film__flare {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 52vw;
+  height: 2px;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(90deg, transparent, rgba(190, 215, 255, 0.55), transparent);
+  filter: blur(0.6px);
+}
+
+/* The cards: each cuts in hard, holds with a slow push-in, and cuts out. */
+.film__card {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  /* One column exactly as wide as the screen allows, so lines wrap within it even while the
+     brand's letters are still spaced out wider. */
+  grid-template-columns: minmax(0, 1fr);
+  align-content: center;
+  justify-items: center;
+  padding-inline: var(--gutter);
+  text-align: center;
+  opacity: 0;
+  animation: film-card var(--len) var(--at) linear forwards;
+}
+@keyframes film-card {
+  0% {
+    opacity: 1;
+    transform: scale(1.07);
+  }
+  99.5% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+.film__card--method {
+  --at: 0.75s;
+  --len: 1.2s;
+}
+.film__card--edge {
+  --at: 1.95s;
+  --len: 1.2s;
+}
+.film__card--verdict {
+  --at: 3.15s;
+  --len: 1.3s;
+}
+.film__card--pathway {
+  --at: 4.45s;
+  --len: 1.3s;
+}
+.film__eyebrow {
+  margin-bottom: 1.4rem;
+  font-size: clamp(0.72rem, 0.64rem + 0.3vw, 0.9rem);
+  font-weight: 700;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--volt);
+}
+.film__line {
+  /* Kept below the hero headline's size, so the page's own headline stays its largest text. */
+  font-size: clamp(2rem, 1rem + 5vw, 6.2rem);
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--bone);
+}
+.film__line em {
+  font-style: normal;
+  color: var(--volt);
+}
+.film__line--stack span {
+  display: block;
+  opacity: 0;
+  animation: film-rise 0.5s var(--ease-out) forwards;
+}
+.film__line--stack span:nth-child(1) {
+  animation-delay: 4.45s;
+}
+.film__line--stack span:nth-child(2) {
+  animation-delay: 4.7s;
+}
+.film__line--stack span:nth-child(3) {
+  animation-delay: 4.95s;
+}
+@keyframes film-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.film__score {
+  font-size: clamp(5rem, 2rem + 13vw, 13rem);
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 60px rgba(215, 255, 58, 0.25);
+}
+.film__stars {
+  display: flex;
+  gap: 0.4rem;
+  margin: 1.1rem 0 1.2rem;
+  font-size: clamp(1.4rem, 1rem + 1.5vw, 2.4rem);
+  color: var(--volt);
+}
+.film__stars span {
+  opacity: 0;
+  transform: scale(0.4);
+  animation: film-pop 0.35s var(--ease-out) forwards;
+  animation-delay: calc(3.3s + var(--i) * 0.08s);
+}
+@keyframes film-pop {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.film__small {
+  font-size: clamp(0.74rem, 0.66rem + 0.35vw, 0.95rem);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--smoke);
+}
+
+/* The brand lands: a hard cut, the letters tracking in, then the line beneath. */
+.film__card--brand {
+  animation:
+    film-cut 0.01s 5.75s forwards,
+    film-dissolve 0.5s 7s ease forwards;
+}
+@keyframes film-cut {
+  to {
+    opacity: 1;
+  }
+}
+@keyframes film-dissolve {
+  to {
+    opacity: 0;
+    filter: blur(14px);
+    transform: scale(1.05);
+  }
+}
+.film__brand {
+  font-size: clamp(3.4rem, 1rem + 12vw, 12rem);
+  font-weight: 900;
+  font-stretch: 125%;
+  line-height: 0.9;
+  text-transform: uppercase;
+  animation: film-track 1.3s 5.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Tracking plus a matching indent, so the word stays centred while its spacing closes up. */
+@keyframes film-track {
+  from {
+    letter-spacing: 0.5em;
+    padding-left: 0.5em;
+    filter: brightness(1.6);
+  }
+  to {
+    letter-spacing: 0.08em;
+    padding-left: 0.08em;
+    filter: none;
+  }
+}
+.film__sub {
+  margin-top: 1.3rem;
+  font-size: clamp(0.85rem, 0.7rem + 0.6vw, 1.25rem);
+  font-weight: 700;
+  letter-spacing: 0.36em;
+  text-transform: uppercase;
+  opacity: 0;
+  animation: film-rise 0.8s 6.15s var(--ease-out) forwards;
+}
+.film__sub span {
+  color: var(--volt);
+}
+.film__small--brand {
+  margin-top: 0.9rem;
+  opacity: 0;
+  animation: film-rise 0.8s 6.45s var(--ease-out) forwards;
+}
+
+.film__skip {
+  position: absolute;
+  right: var(--gutter);
+  bottom: calc(5.5vh - 1.05rem);
+  z-index: 3;
+  min-height: 2.1rem;
+  padding: 0 0.95rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--smoke);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.film__skip {
+  animation: film-out 0.4s 7.15s forwards;
+}
+.film__skip:hover {
+  color: var(--bone);
+  border-color: var(--bone);
+}
+
+@media (max-width: 760px) {
+  .film__bar {
+    height: 8vh;
+  }
+  .film__skip {
+    bottom: calc(4vh - 1.05rem);
+  }
+  .film__light {
+    top: 12vh;
+  }
+  .film__line {
+    font-size: 9vw;
+  }
+  .film__beam {
+    opacity: 0.7;
+  }
+}
+
+/* "Play the film" in the hero. */
+.hero__film {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--bone);
+  font-weight: 600;
+  cursor: pointer;
+}
+.hero__film-icon {
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.hero__film:hover .hero__film-icon {
+  border-color: var(--volt);
+  background: rgba(215, 255, 58, 0.1);
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero__film {
+    display: none;
+  }
 }

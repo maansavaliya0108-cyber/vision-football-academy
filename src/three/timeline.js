@@ -1,7 +1,8 @@
 // Scroll story timeline. Everything is driven by scroll progress p ∈ [0, 1], written by the page
 // into storyState; the scene reads it every frame.
 
-export const storyState = { progress: 0, pointerX: 0, pointerY: 0, pointerAt: -Infinity, reduced: false, introAt: null }
+// holdIntro: while the opening film plays, the particles wait to fly in until it hands over.
+export const storyState = { progress: 0, pointerX: 0, pointerY: 0, pointerAt: -Infinity, reduced: false, introAt: null, holdIntro: false }
 
 export const clamp01 = (v) => Math.min(1, Math.max(0, v))
 export const smooth = (v) => v * v * (3 - 2 * v)

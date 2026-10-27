@@ -4,6 +4,7 @@ import { formatTime } from '../../shared/schedule.js'
 import { storyState, clamp01 } from '../three/timeline'
 import { useTrainingStatus } from './useTrainingStatus'
 import { PhoneIcon, Stars } from './icons'
+import { Opener, playFilm } from './Opener'
 
 const StoryCanvas = lazy(() => import('../three/ParticleCanvas.jsx'))
 
@@ -108,6 +109,7 @@ export function Story() {
 
   return (
     <section className="story" ref={section} id="top" aria-label="Introduction">
+      <Opener />
       <div className={`story__stage ${ready ? 'is-ready' : ''}`}>
         {gl && startGl && (
           <div className="story__gl">
@@ -148,6 +150,16 @@ export function Story() {
                   <strong>{google.score.toFixed(1)}</strong> on Google, {google.countLabel}
                 </span>
               </p>
+              {gl && (
+                <button type="button" className="hero__film" onClick={playFilm}>
+                  <span className="hero__film-icon" aria-hidden="true">
+                    <svg width="10" height="12" viewBox="0 0 10 12">
+                      <path d="M0 0 10 6 0 12Z" fill="currentColor" />
+                    </svg>
+                  </span>
+                  Play the film
+                </button>
+              )}
             </div>
           </div>
           <h1 className="hero__title">
