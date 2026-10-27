@@ -493,6 +493,29 @@
   text-transform: uppercase;
   margin-bottom: 1.25rem;
 }
+/* Beat headlines rise word by word, each out of its own mask, with a slight tilt that settles. */
+.kinetic__word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.kinetic__inner {
+  display: inline-block;
+  transform: translateY(110%) rotate(5deg);
+  transform-origin: left bottom;
+  transition: transform 0.95s var(--ease-out);
+  transition-delay: calc(var(--i) * 70ms);
+}
+.kinetic.is-in .kinetic__inner {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kinetic__inner {
+    transform: none;
+  }
+}
 .beat p {
   font-size: var(--step-1);
   line-height: 1.45;

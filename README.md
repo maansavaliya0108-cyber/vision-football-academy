@@ -25,7 +25,7 @@ Each page has its own title, description, canonical link and share preview, writ
 
 | Section | What it does |
 | --- | --- |
-| Opening scroll story | 26,000 particles of light (16,000 on phones) that keep re-forming as you scroll. They fly in and assemble into a spinning football (which scatters from your cursor), burst into a vortex, rain down into the pitch with the players and blocked lanes, flow along the pass as a river of volt, then pull together into the VISION wordmark. |
+| Opening scroll story | A short film you scroll through, made of 26,000 particles of light (16,000 on phones). They pour in and form a spinning football (which scatters from your cursor). The camera dives into the ball as it bursts with a shockwave, then pulls back as the cloud builds the word THINK. letter by letter. The word melts into ribbons that draw the pitch, then the camera cranes up for the tactical picture: the pressed player, the blocked passes, the open one. It drops to the turf and rides alongside the pass in slow motion as a light sweeps the pitch, then pulls back while everything locks into the VISION wordmark with a flash. Particles leave light trails while they move, and out-of-focus points blur like a camera lens. The headlines rise in word by word. |
 | Every session covers four things | Technical, Physical, Tactical and Mental, laid out as the four quarters of a pitch |
 | Five ways to train | The five programs as a team sheet. "Enquire about…" pre-fills the form. |
 | Match time is the measure | The pathway from training ground to state scouts |
@@ -102,7 +102,7 @@ For the full version with stored enquiries and the dashboard, run the server as 
 
 Everything the site says about the academy is in [`shared/academy.js`](shared/academy.js): phone, address, timings, ratings, philosophy, programs and pathway. The page and the server's form validation both read from it, so a program you add there appears in the program list, the form dropdown and the dashboard.
 
-The particle formations (ball, vortex, pitch, the play, wordmark) are built in [`src/three/shapes.js`](src/three/shapes.js); when each one appears as you scroll is set in [`src/three/timeline.js`](src/three/timeline.js).
+The particle formations (ball, the word, pitch, the play, wordmark) are built in [`src/three/shapes.js`](src/three/shapes.js); when each one appears as you scroll is set in [`src/three/timeline.js`](src/three/timeline.js). The camera's shots are the `SHOTS` list in [`src/three/ParticleCanvas.jsx`](src/three/ParticleCanvas.jsx), and the timed moments (the burst, the slow-motion pass, the landing) are in [`src/three/director.js`](src/three/director.js). On slower devices the scene steps itself down (fewer light trails, then no glow); with reduced motion turned on there are no trails, shakes or camera dives.
 
 The share image (`public/og.png`, shown when the link is posted on WhatsApp, Instagram or X) is a capture of the live hero. With the dev server running and Google Chrome installed:
 

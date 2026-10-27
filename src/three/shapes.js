@@ -87,21 +87,68 @@ export function ballShape(n, radius) {
   return { pos, kind }
 }
 
-// ---------- B: the vortex ----------
+// ---------- Drawing type and marks into points ----------
 
-export function vortexShape(n, seed = 5) {
-  const rand = rng(seed)
+const INK_W = 1400
+const INK_H = 360
+
+function inkCanvas() {
+  const canvas = document.createElement('canvas')
+  canvas.width = INK_W
+  canvas.height = INK_H
+  const ctx = canvas.getContext('2d')
+  ctx.font = '900 230px Archivo'
+  ctx.fontStretch = 'expanded'
+  ctx.textBaseline = 'middle'
+  return ctx
+}
+
+/**
+ * Turns what was drawn on an ink canvas into n points: 86% on the ink (volt where it was drawn in
+ * volt), the rest as dust around it. `depth` gives the letters thickness, so they read as solid
+ * shapes when the camera moves past them.
+ */
+function sampleInk(n, ctx, rand, depth) {
+  const img = ctx.getImageData(0, 0, INK_W, INK_H).data
+  const filled = []
+  for (let y = 0; y < INK_H; y += 2) {
+    for (let x = 0; x < INK_W; x += 2) {
+      const o = (y * INK_W + x) * 4
+      if (img[o + 3] > 128) filled.push([x, y, img[o + 2] < 120])
+    }
+  }
   const pos = new Float32Array(n * 3)
   const kind = new Float32Array(n)
+  const onInk = Math.floor(n * 0.86)
+  const scale = 11 / INK_W
   for (let i = 0; i < n; i++) {
-    const arm = i % 3
-    const r = 0.25 + Math.pow(rand(), 0.7) * 6.5
-    const a = r * 0.9 + (arm * Math.PI * 2) / 3 + (rand() - 0.5) * (0.5 + r * 0.05)
-    const h = (rand() - 0.5) * (1.2 - r * 0.12)
-    pos.set([Math.cos(a) * r, h, Math.sin(a) * r], i * 3)
-    kind[i] = r < 1.4 ? KIND.VOLT : rand() < 0.6 ? KIND.WHITE : KIND.LINE
+    if (i < onInk && filled.length) {
+      const [x, y, volt] = filled[Math.floor(rand() * filled.length)]
+      pos.set([(x - INK_W / 2) * scale + (rand() - 0.5) * 0.02, -(y - INK_H / 2) * scale, (rand() - 0.5) * depth], i * 3)
+      kind[i] = volt ? KIND.VOLT : KIND.WHITE
+    } else {
+      pos.set([(rand() - 0.5) * 16, (rand() - 0.5) * 7, (rand() - 0.5) * 4], i * 3)
+      kind[i] = KIND.DUST
+    }
   }
   return { pos, kind }
+}
+
+// ---------- B: the word ----------
+
+/** "THINK." set in the display face, with the full stop in volt, as in the hero headline. */
+export function wordShape(n, seed = 5) {
+  const ctx = inkCanvas()
+  ctx.font = '900 250px Archivo'
+  ctx.fontStretch = 'expanded'
+  const word = 'THINK'
+  const wordW = ctx.measureText(word).width
+  const x = (INK_W - ctx.measureText(`${word}.`).width) / 2
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText(word, x, INK_H / 2 + 8)
+  ctx.fillStyle = '#d7ff3a'
+  ctx.fillText('.', x + wordW, INK_H / 2 + 8)
+  return sampleInk(n, ctx, rng(seed), 0.6)
 }
 
 // ---------- C and D: the pitch and the play ----------
@@ -246,13 +293,7 @@ export const playShape = (n) => boardShape(n, true, 9)
 // ---------- E: the wordmark ----------
 
 export function wordmarkShape(n, seed = 13) {
-  const rand = rng(seed)
-  const W = 1400
-  const H = 360
-  const canvas = document.createElement('canvas')
-  canvas.width = W
-  canvas.height = H
-  const ctx = canvas.getContext('2d')
+  const ctx = inkCanvas()
   // Mark: lens ring in white, V in volt; then the name.
   ctx.lineCap = 'round'
   ctx.lineJoin = 'round'
@@ -269,34 +310,8 @@ export function wordmarkShape(n, seed = 13) {
   ctx.lineTo(235, 120)
   ctx.stroke()
   ctx.fillStyle = '#ffffff'
-  ctx.font = '900 230px Archivo'
-  ctx.fontStretch = 'expanded'
-  ctx.textBaseline = 'middle'
   ctx.fillText('VISION', 345, 192)
-
-  const img = ctx.getImageData(0, 0, W, H).data
-  const filled = []
-  for (let y = 0; y < H; y += 2) {
-    for (let x = 0; x < W; x += 2) {
-      const o = (y * W + x) * 4
-      if (img[o + 3] > 128) filled.push([x, y, img[o + 2] < 120])
-    }
-  }
-  const pos = new Float32Array(n * 3)
-  const kind = new Float32Array(n)
-  const onMark = Math.floor(n * 0.86)
-  const scale = 11 / W
-  for (let i = 0; i < n; i++) {
-    if (i < onMark && filled.length) {
-      const [x, y, volt] = filled[Math.floor(rand() * filled.length)]
-      pos.set([(x - W / 2) * scale + (rand() - 0.5) * 0.02, -(y - H / 2) * scale, (rand() - 0.5) * 0.12], i * 3)
-      kind[i] = volt ? KIND.VOLT : KIND.WHITE
-    } else {
-      pos.set([(rand() - 0.5) * 16, (rand() - 0.5) * 7, (rand() - 0.5) * 4], i * 3)
-      kind[i] = KIND.DUST
-    }
-  }
-  return { pos, kind }
+  return sampleInk(n, ctx, rng(seed), 0.12)
 }
 
 /** Where every particle starts before the intro: a wide, deep cloud it flies in from. */

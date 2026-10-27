@@ -10,7 +10,7 @@ export const span = (p, a, b) => smooth(clamp01((p - a) / (b - a)))
 
 /**
  * Which formation the particles are in, as a continuous stage number:
- * 0 ball · 1 vortex · 2 pitch and players · 3 the pass · 4 wordmark.
+ * 0 ball · 1 the word THINK. · 2 pitch and players · 3 the pass · 4 wordmark.
  * Holds give each formation time on screen while its copy is being read.
  */
 const STAGE_KEYS = [

@@ -1,4 +1,4 @@
-import { Suspense, lazy, useEffect, useRef, useState } from 'react'
+import { Fragment, Suspense, lazy, useEffect, useRef, useState } from 'react'
 import { academy } from '../../shared/academy.js'
 import { formatTime } from '../../shared/schedule.js'
 import { storyState, clamp01 } from '../three/timeline'
@@ -25,6 +25,32 @@ export function StatusBadge({ status, tone = 'dark' }) {
         <span className="status__when">{status.live ? `, until ${formatTime(academy.schedule[0].close)}` : `: ${status.label}`}</span>
       </span>
     </p>
+  )
+}
+
+/** A beat's headline, which rises into place word by word each time it scrolls into view. */
+function KineticTitle({ children }) {
+  const ref = useRef(null)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => setShown(e.isIntersecting), { threshold: 0.5 })
+    io.observe(ref.current)
+    return () => io.disconnect()
+  }, [])
+  const words = children.split(' ')
+  return (
+    <h2 ref={ref} className={`beat__title kinetic ${shown ? 'is-in' : ''}`}>
+      {words.map((word, i) => (
+        <Fragment key={i}>
+          <span className="kinetic__word">
+            <span className="kinetic__inner" style={{ '--i': i }}>
+              {word}
+            </span>
+          </span>
+          {i < words.length - 1 && ' '}
+        </Fragment>
+      ))}
+    </h2>
   )
 }
 
@@ -137,7 +163,7 @@ export function Story() {
 
       <div className="story__beat">
         <div className="beat">
-          <h2 className="beat__title">Coaches set the problem. Players find the answer.</h2>
+          <KineticTitle>Coaches set the problem. Players find the answer.</KineticTitle>
           <p>
             The academy calls it <strong>{academy.philosophy.name}</strong>. Instead of rigid drills where players
             only follow instructions, sessions are built around guided self-discovery.
@@ -147,7 +173,7 @@ export function Story() {
 
       <div className="story__beat">
         <div className="beat">
-          <h2 className="beat__title">See the pressure before the ball arrives.</h2>
+          <KineticTitle>See the pressure before the ball arrives.</KineticTitle>
           <p>
             Players learn to check their shoulders and spot their options early. Here, the player on the ball is
             pressed from their blind side. Two passes are blocked. One is on.
@@ -175,7 +201,7 @@ export function Story() {
 
       <div className="story__beat story__beat--last">
         <div className="beat">
-          <h2 className="beat__title">Decide, then play.</h2>
+          <KineticTitle>Decide, then play.</KineticTitle>
           <p>{academy.philosophy.objective}</p>
           <a className="beat__link" href="#method">
             How a session is built
