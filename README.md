@@ -55,9 +55,9 @@ An eight-second promo, cut like a sports-brand ad, opens the site on a first vis
 
 Every line comes from `shared/academy.js`; there are no claims beyond the academy's confirmed facts.
 
-- **When it plays:** once per visitor, remembered in the browser. Never for links to a section such as `/#join`, never when arriving from another page, and never with reduced motion turned on.
+- **When it plays by itself:** once per visitor, remembered in the browser. Never for links to a section such as `/#join`, never when arriving from another page, and never when the device is set to reduce motion.
 - **Skipping:** the Skip intro button, any key, a click, or a scroll.
-- **Watching again:** "Play the film" in the hero.
+- **Watching it any time:** press **Watch the film** in the hero, or **Watch the film** in the footer on any page, which goes to the home page and plays it. A press always plays the full film, even on a device set to reduce motion, because the visitor chose it.
 - **Sharing:** add `?film` to the address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?film`. That link always opens with the film, which makes it a good one for WhatsApp and Instagram.
 
 It lives in [`src/site/Opener.jsx`](src/site/Opener.jsx) (timing, the light streaks) and the "The film" section of [`src/styles/site.css`](src/styles/site.css) (cards, lights, letterbox). The two share one clock, so change their timings together.
@@ -128,7 +128,7 @@ For the full version with stored enquiries and the dashboard, run the server as 
 
 Everything the site says about the academy is in [`shared/academy.js`](shared/academy.js): phone, address, timings, ratings, philosophy, programs and pathway. The page and the server's form validation both read from it, so a program you add there appears in the program list, the form dropdown and the dashboard.
 
-The particle formations (ball, the word, pitch, the play, wordmark) are built in [`src/three/shapes.js`](src/three/shapes.js); when each one appears as you scroll is set in [`src/three/timeline.js`](src/three/timeline.js). The camera's shots are the `SHOTS` list in [`src/three/ParticleCanvas.jsx`](src/three/ParticleCanvas.jsx), and the timed moments (the burst, the slow-motion pass, the landing) are in [`src/three/director.js`](src/three/director.js). On slower devices the scene steps itself down (fewer light trails, then no glow); with reduced motion turned on there are no trails, shakes or camera dives.
+The particle formations (ball, the word, pitch, the play, wordmark) are built in [`src/three/shapes.js`](src/three/shapes.js); when each one appears as you scroll is set in [`src/three/timeline.js`](src/three/timeline.js). The camera's shots are the `SHOTS` list in [`src/three/ParticleCanvas.jsx`](src/three/ParticleCanvas.jsx), and the timed moments (the burst, the slow-motion pass, the landing) are in [`src/three/director.js`](src/three/director.js). On slower devices the scene steps itself down (fewer light trails, then no glow); with reduced motion turned on there are no trails, shakes or camera dives. On those devices a **Full animation** switch appears under the hero buttons. It brings back the full story and is remembered for next time.
 
 The share image (`public/og.png`, shown when the link is posted on WhatsApp, Instagram or X) is the opening film's brand card: VISION under the floodlights, with the place and timings beneath. With the dev server running and Google Chrome installed:
 

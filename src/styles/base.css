@@ -211,10 +211,11 @@ textarea {
   text-decoration: none;
 }
 
+/* The film is left out: with reduced motion it only plays when the visitor presses Play. */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *:not(.film, .film *),
+  *:not(.film, .film *)::before,
+  *:not(.film, .film *)::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;

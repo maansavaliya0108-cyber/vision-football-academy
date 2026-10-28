@@ -1844,6 +1844,19 @@
 .footer__links a:hover {
   text-decoration: underline;
 }
+/* Looks like the links around it; it's a button because it plays the film rather than going somewhere. */
+.footer__film {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.footer__film:hover {
+  text-decoration: underline;
+}
 
 /* ---------- Page header ---------- */
 
@@ -2785,35 +2798,95 @@
   }
 }
 
-/* "Play the film" in the hero. */
-.hero__film {
+/* "Watch the film" and the full-animation switch, under the hero buttons. */
+.hero__watch {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.1rem;
+}
+.watch {
   display: inline-flex;
   align-items: center;
+  gap: 0.75rem;
+  padding: 0.35rem 1.1rem 0.35rem 0.35rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: rgba(6, 6, 7, 0.55);
+  color: var(--bone);
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.watch:hover {
+  border-color: var(--volt);
+  background: rgba(215, 255, 58, 0.08);
+}
+.watch__icon {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding-left: 3px;
+  border-radius: 50%;
+  background: var(--volt);
+  color: var(--ink);
+  box-shadow: 0 0 22px rgba(215, 255, 58, 0.35);
+}
+.watch__text {
+  display: inline-flex;
+  align-items: baseline;
   gap: 0.55rem;
+}
+.watch__length {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+/* Shown only on devices set to reduce motion: switches the full 3D story back on. */
+.motion-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--bone);
+  color: var(--smoke);
   font-weight: 600;
   cursor: pointer;
 }
-.hero__film-icon {
-  display: grid;
-  place-items: center;
-  width: 1.9rem;
-  height: 1.9rem;
+.motion-switch__track {
+  position: relative;
+  width: 2.4rem;
+  height: 1.35rem;
   border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--graphite);
+}
+.motion-switch__track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(1.35rem - 6px);
+  height: calc(1.35rem - 6px);
   border-radius: 50%;
-  transition: border-color 0.2s, background-color 0.2s;
+  background: var(--smoke);
+  transition: transform 0.2s var(--ease-out), background-color 0.2s;
 }
-.hero__film:hover .hero__film-icon {
+.motion-switch[aria-pressed='true'] {
+  color: var(--bone);
+}
+.motion-switch[aria-pressed='true'] .motion-switch__track {
   border-color: var(--volt);
-  background: rgba(215, 255, 58, 0.1);
+  background: rgba(215, 255, 58, 0.18);
 }
-@media (prefers-reduced-motion: reduce) {
-  .hero__film {
-    display: none;
-  }
+.motion-switch[aria-pressed='true'] .motion-switch__track::after {
+  transform: translateX(1.05rem);
+  background: var(--volt);
 }
 
 /* ---------- Proof bar: the academy at a glance, straight after the story ---------- */

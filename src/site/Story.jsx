@@ -7,6 +7,8 @@ import { PhoneIcon, Stars } from './icons'
 import { Opener, playFilm } from './Opener'
 
 const StoryCanvas = lazy(() => import('../three/ParticleCanvas.jsx'))
+// Remembers a visitor's choice to see the full animation on a device set to reduce motion.
+const MOTION = 'vfa-motion'
 
 function webglAvailable() {
   try {
@@ -74,13 +76,32 @@ export function Story() {
   }, [gl])
   const [device] = useState(() => ({
     lite: window.innerWidth < 768 || (navigator.hardwareConcurrency || 8) <= 4,
-    reduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    prefersReduced: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
   }))
+  // On a device set to reduce motion, the visitor can still switch the full animation on (remembered).
+  const [motionOn, setMotionOn] = useState(() => {
+    try {
+      return window.localStorage.getItem(MOTION) === 'on'
+    } catch {
+      return false
+    }
+  })
+  const reduced = device.prefersReduced && !motionOn
+  const toggleMotion = () => {
+    setMotionOn((on) => {
+      try {
+        window.localStorage.setItem(MOTION, on ? 'off' : 'on')
+      } catch {
+        // Not remembered in private browsing; it still applies for this visit.
+      }
+      return !on
+    })
+  }
   const status = useTrainingStatus()
   const google = academy.ratings.find((r) => r.source === 'Google')
 
   useEffect(() => {
-    storyState.reduced = device.reduced
+    storyState.reduced = reduced
     const el = section.current
     const measure = () => {
       const rect = el.getBoundingClientRect()
@@ -105,7 +126,7 @@ export function Story() {
       window.removeEventListener('pointermove', onPointer)
       io.disconnect()
     }
-  }, [device.reduced])
+  }, [reduced])
 
   return (
     <section className="story" ref={section} id="top" aria-label="Introduction">
@@ -117,7 +138,7 @@ export function Story() {
               <StoryCanvas
                 active={active}
                 lite={device.lite}
-                reduced={device.reduced}
+                reduced={reduced}
                 onReady={() => setReady(true)}
               />
             </Suspense>
@@ -143,6 +164,25 @@ export function Story() {
                 Call {academy.phone.display}
               </a>
             </div>
+            <div className="hero__watch">
+              <button type="button" className="watch" onClick={playFilm}>
+                <span className="watch__icon" aria-hidden="true">
+                  <svg width="12" height="14" viewBox="0 0 10 12">
+                    <path d="M0 0 10 6 0 12Z" fill="currentColor" />
+                  </svg>
+                </span>
+                <span className="watch__text">
+                  Watch the film
+                  <span className="watch__length">8 sec</span>
+                </span>
+              </button>
+              {gl && device.prefersReduced && (
+                <button type="button" className="motion-switch" aria-pressed={motionOn} onClick={toggleMotion}>
+                  <span className="motion-switch__track" aria-hidden="true" />
+                  Full animation
+                </button>
+              )}
+            </div>
             <div className="hero__meta">
               <StatusBadge status={status} />
               <p className="hero__rating">
@@ -151,16 +191,6 @@ export function Story() {
                   <strong>{google.score.toFixed(1)}</strong> on Google, {google.countLabel}
                 </span>
               </p>
-              {gl && (
-                <button type="button" className="hero__film" onClick={playFilm}>
-                  <span className="hero__film-icon" aria-hidden="true">
-                    <svg width="10" height="12" viewBox="0 0 10 12">
-                      <path d="M0 0 10 6 0 12Z" fill="currentColor" />
-                    </svg>
-                  </span>
-                  Play the film
-                </button>
-              )}
             </div>
           </div>
           <h1 className="hero__title">

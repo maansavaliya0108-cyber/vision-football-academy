@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { academy } from '../../shared/academy.js'
-import { currentPath } from '../router'
+import { currentPath, navigate } from '../router'
 import { storyState } from '../three/timeline'
 
 /**
@@ -37,8 +37,18 @@ const willPlay = (() => {
 if (willPlay) storyState.holdIntro = true
 let played = false
 
-/** Plays the film again from anywhere on the home page. */
-export const playFilm = () => window.dispatchEvent(new Event('vfa:film'))
+// Set when the film is asked for from another page: the home page plays it as soon as it opens.
+let pending = false
+
+/**
+ * Plays the film on request, from any page (another page goes home first). A request always plays,
+ * even with reduced motion on: pressing Play is the visitor's own choice.
+ */
+export function playFilm() {
+  pending = true
+  if (currentPath() !== '/') navigate('/')
+  window.dispatchEvent(new Event('vfa:film'))
+}
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const smooth = (t) => t * t * (3 - 2 * t)
@@ -197,15 +207,18 @@ function Floodlight({ side }) {
 }
 
 export function Opener() {
-  const [state, setState] = useState(() => (willPlay && !played ? 'playing' : 'done'))
-  // Bumped on every replay, so the film's CSS animations restart from the top.
-  const [take, setTake] = useState(0)
+  const [state, setState] = useState(() => (pending || (willPlay && !played) ? 'playing' : 'done'))
+  // Bumped on every replay, so the film's CSS animations restart from the top. A requested play
+  // counts as a replay: it never holds the 3D scene back or skips for a scrolled page.
+  const [take, setTake] = useState(() => (pending ? 1 : 0))
   const canvas = useRef(null)
   const google = academy.ratings.find((r) => r.source === 'Google')
 
   // "Play the film" from the hero.
   useEffect(() => {
+    pending = false
     const replay = () => {
+      pending = false
       window.scrollTo(0, 0)
       setTake((n) => n + 1)
       setState('playing')
