@@ -258,25 +258,6 @@ Checked on a production build before publishing.
 - Nothing overflows on any page at 11 widths from 320 to 1440 px, including the nav with its new Play link.
 - Lighthouse: home 98 on phones and 100 on desktop, `/play` 98 on phones. Accessibility, best practices and SEO are 100.
 
-## Head Up, the short film
-
-Checked on a production build before publishing.
-
-- **The file** decodes in Chrome: 64.6 s, 1920 × 1080, H.264 video with an AAC audio track, 38.7 MB at 5 Mbps.
-- **Frames** sampled every 2 seconds from the encoded file match the shot list, with the story readable from the pictures alone: the lights, the lost ball, the coach, the five days, the match, the goal and the end card.
-- **The sound** follows the picture: loudness measured every half second rises and falls with the story. The tackle hit, the five-day build, the muffled slow motion and the goal all land on their frames.
-- **The player** passes 21 of 21 checks:
-  - The hero, footer and home-page poster all open the short film.
-  - The switch changes to the promo and back, with sound on.
-  - The title and download links follow the film.
-  - **Or the 33 sec promo** opens the promo.
-  - `?film` opens the short film and `?promo` opens the promo. Both start muted, and the opener doesn't play over them.
-  - On a 390 px phone the player's header fits; the promo uses its 9:16 cut there.
-- **Accessibility:** 0 axe violations with the player open on either film, at desktop and phone size, and 0 on the pages.
-- **Layout and speed:**
-  - Nothing overflows on any page at 11 widths.
-  - Lighthouse on the home page: 95 on phones, 100 on desktop. Accessibility, best practices and SEO are 100.
-
 ## Not covered
 
 - Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.

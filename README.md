@@ -61,30 +61,6 @@ Every line comes from `shared/academy.js`; there are no claims beyond the academ
 
 It lives in [`src/site/Opener.jsx`](src/site/Opener.jsx) (timing, the light streaks) and the "The film" section of [`src/styles/site.css`](src/styles/site.css) (cards, lights, letterbox). The two share one clock, so change their timings together.
 
-### Head Up, the short film (1 minute)
-
-An animated short with a story, rather than a cut of the website: [`public/media/vision-head-up.mp4`](public/media/vision-head-up.mp4) (1920 × 1080, letterboxed to 2.39:1, with sound). Everything in it is built and lit in 3D: the floodlit ground in Adajan, the players and their coach, the camera work and the score.
-
-1. 6:00 PM in Adajan, Surat. The floodlights come on one by one, and a young Vision player walks on with the ball.
-2. In a drill he takes the ball with his head down, and a defender takes it from his blind side. The picture freezes: "Head down."
-3. His coach walks over and points to his own eyes: "Coaches set the problem."
-4. Monday to Friday, 6–9 PM, one bar of music a day: he checks his shoulders more, and faster, every day. Each check sweeps a beam of vision across the pitch and lights up the players he has seen. Wednesday it rains. "Players find the answer."
-5. Match night. The ball comes to him with a defender closing from behind, and this time he has already looked. In slow motion he plays it first time into a runner's path: "Think one pass ahead."
-6. The runner scores, and he lifts his head to the lights: "Head up."
-7. The pathway over the whole ground (training ground, district trials, state scouts), then the end card: VISION, Book a visit, the phone number, Mon–Fri · 6–9 PM · Boghara School Ground · 5.0 on Google.
-
-The players, the coach and the story are invented to show the method; every fact on screen comes from `shared/academy.js`. The music (96 BPM, D minor turning to D major at the goal) and the sound (the floodlight relays, the ball, the tackle, the rain, the crowd, the net) are synthesized, so there's no licence to worry about.
-
-- **On the site:** **Watch the film** in the hero, the film section on the home page and every page footer open it in a full-screen player. A switch in the player changes between the short film and the 33-second promo, and the home page also links straight to the promo.
-- **Sharing:** add `?film` to any address for the short film, or `?promo` for the promo. Browsers start it muted until the viewer taps for sound.
-- **Changing it:** the film is made in [`film/`](film/): `world.js` (the ground, lights and weather), `people.js` (the players' bodies and movement), `main.js` (the story, the shots, the cards and the edit) and `score.js` (the music and sound). With the dev server running:
-
-```bash
-npm run film
-```
-
-That renders the film and its poster into `public/media` in under a minute, using Chrome's own video encoder. To check frames without rendering the whole film, use `npm run film -- --stills <folder>`, optionally followed by times in seconds.
-
 ### The promo film (33 seconds)
 
 A real video file, for the site and for posting: [`public/media/vision-promo-16x9.mp4`](public/media/vision-promo-16x9.mp4) (1920 × 1080, for the site and YouTube) and [`public/media/vision-promo-9x16.mp4`](public/media/vision-promo-9x16.mp4) (1080 × 1920, for Instagram Reels and WhatsApp Status). It is cut from the same particle scene as the site, with title cards and sound design:
@@ -101,8 +77,8 @@ A real video file, for the site and for posting: [`public/media/vision-promo-16x
 
 Every line comes from `shared/academy.js`. The sound is synthesized (impacts, whooshes, risers and a low drone), so there's no music licence to worry about.
 
-- **On the site:** the film player's **Promo** switch, or **Or the 33 sec promo** in the home page's film section. Phones held upright get the 9:16 cut, and the player has download links for both cuts.
-- **Sharing:** add `?promo` to any address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?promo`, and the page opens straight into the promo.
+- **On the site:** **Watch the film** in the hero, the film section on the home page, and **Watch the film** in every page footer all open it in a full-screen player. It plays with sound, and phones held upright get the 9:16 cut. The player has Book a visit and download links for both cuts.
+- **Sharing:** add `?film` to any address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?film`, and the page opens straight into the film. Browsers start it muted until the viewer taps for sound.
 - **Changing it:** the film is rendered from [`promo/main.js`](promo/main.js) (the timeline, camera, cards and soundtrack). With the dev server running:
 
 ```bash
