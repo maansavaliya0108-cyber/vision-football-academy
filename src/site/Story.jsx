@@ -5,7 +5,7 @@ import { storyState, clamp01 } from '../three/timeline'
 import { useTrainingStatus } from './useTrainingStatus'
 import { PhoneIcon, Stars } from './icons'
 import { Opener } from './Opener'
-import { PROMO, openFilm } from './FilmPlayer'
+import { SHORT, openFilm } from './FilmPlayer'
 
 const StoryCanvas = lazy(() => import('../three/ParticleCanvas.jsx'))
 // Remembers a visitor's choice to see the full animation on a device set to reduce motion.
@@ -166,7 +166,7 @@ export function Story() {
               </a>
             </div>
             <div className="hero__watch">
-              <button type="button" className="watch" onClick={openFilm}>
+              <button type="button" className="watch" onClick={() => openFilm()}>
                 <span className="watch__icon" aria-hidden="true">
                   <svg width="12" height="14" viewBox="0 0 10 12">
                     <path d="M0 0 10 6 0 12Z" fill="currentColor" />
@@ -174,7 +174,7 @@ export function Story() {
                 </span>
                 <span className="watch__text">
                   Watch the film
-                  <span className="watch__length">{PROMO.seconds} sec</span>
+                  <span className="watch__length">{SHORT.length}</span>
                 </span>
               </button>
               {gl && device.prefersReduced && (

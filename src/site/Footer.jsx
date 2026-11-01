@@ -35,7 +35,7 @@ export function Footer() {
               <Link to="/visit#join">Book a visit</Link>
             </li>
             <li>
-              <button type="button" className="footer__film" onClick={openFilm}>
+              <button type="button" className="footer__film" onClick={() => openFilm()}>
                 Watch the film
               </button>
             </li>
