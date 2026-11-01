@@ -26,7 +26,8 @@ export function QuickBar({ path }) {
     }
   }, [path])
 
-  const shown = pastHero && !formInView
+  // Never over the game: on /play the bar would cover the pitch.
+  const shown = pastHero && !formInView && path !== '/play'
   return (
     <nav className={`quickbar ${shown ? 'is-shown' : ''}`} aria-label="Contact the academy" aria-hidden={!shown}>
       <a href={`tel:${academy.phone.tel}`} tabIndex={shown ? 0 : -1}>

@@ -1,17 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { academy } from '../../shared/academy.js'
-import { currentPath, navigate } from '../router'
+import { currentPath } from '../router'
 import { storyState } from '../three/timeline'
 
 /**
- * The film: an eight-second promo that opens the site on a first visit, like a sports-brand ad.
+ * The opener: an eight-second promo that opens the site on a first visit, like a sports-brand ad.
  * Floodlights snap on; hard cuts carry the method, the edge, the families' verdict and the
  * pathway; the brand lands; and a streak of light spirals into the spot where the 3D ball forms
  * as the scroll story takes over. Every line is a fact from shared/academy.js.
  *
- * It plays once per visitor, any time from the hero's "Play the film" button, and for anyone
- * opening a shared link with ?film in it. The CSS animations in site.css run on the same clock as
- * the timings below, so change both together.
+ * It plays once per visitor, on landing at the home page. (The full 33-second promo is FilmPlayer.)
+ * The CSS animations in site.css run on the same clock as the timings below, so change both together.
  */
 
 const SEEN = 'vfa-film-seen'
@@ -21,14 +20,13 @@ const HANDOVER = 7.15 // the particles start flying in to form the ball
 const ACROSS = [2.0, 2.7]
 const SPIRAL = [6.45, 7.25]
 
-// Decided once, as the app first loads: a first visit landing on the home page itself (or a shared
-// ?film link), with nothing after it in the address and no preference for reduced motion.
+// Decided once, as the app first loads: a first visit landing on the home page itself, with nothing
+// after it in the address (a shared ?film link opens the promo instead) and no preference for reduced motion.
 const willPlay = (() => {
   try {
-    if (currentPath() !== '/' || window.location.hash) return false
+    if (currentPath() !== '/' || window.location.hash || window.location.search.includes('film')) return false
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return false
-    const shared = new URLSearchParams(window.location.search).has('film')
-    return shared || !window.localStorage.getItem(SEEN)
+    return !window.localStorage.getItem(SEEN)
   } catch {
     return false
   }
@@ -36,19 +34,6 @@ const willPlay = (() => {
 // The particles wait for the handover, so they form the ball just as the film ends.
 if (willPlay) storyState.holdIntro = true
 let played = false
-
-// Set when the film is asked for from another page: the home page plays it as soon as it opens.
-let pending = false
-
-/**
- * Plays the film on request, from any page (another page goes home first). A request always plays,
- * even with reduced motion on: pressing Play is the visitor's own choice.
- */
-export function playFilm() {
-  pending = true
-  if (currentPath() !== '/') navigate('/')
-  window.dispatchEvent(new Event('vfa:film'))
-}
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const smooth = (t) => t * t * (3 - 2 * t)
@@ -207,37 +192,19 @@ function Floodlight({ side }) {
 }
 
 export function Opener() {
-  const [state, setState] = useState(() => (pending || (willPlay && !played) ? 'playing' : 'done'))
-  // Bumped on every replay, so the film's CSS animations restart from the top. A requested play
-  // counts as a replay: it never holds the 3D scene back or skips for a scrolled page.
-  const [take, setTake] = useState(() => (pending ? 1 : 0))
+  const [state, setState] = useState(() => (willPlay && !played ? 'playing' : 'done'))
   const canvas = useRef(null)
   const google = academy.ratings.find((r) => r.source === 'Google')
-
-  // "Play the film" from the hero.
-  useEffect(() => {
-    pending = false
-    const replay = () => {
-      pending = false
-      window.scrollTo(0, 0)
-      setTake((n) => n + 1)
-      setState('playing')
-    }
-    window.addEventListener('vfa:film', replay)
-    return () => window.removeEventListener('vfa:film', replay)
-  }, [])
 
   useEffect(() => {
     if (state !== 'playing') return
     // A page restored partway down skips straight to it.
-    if (take === 0 && window.scrollY > 50) {
+    if (window.scrollY > 50) {
       setState('done')
       return
     }
     played = true
-    // On the automatic first play the particles hold until the handover (a replay starts with
-    // the ball already formed).
-    if (take === 0) storyState.holdIntro = true
+    storyState.holdIntro = true
     try {
       window.localStorage.setItem(SEEN, '1')
     } catch {
@@ -255,7 +222,6 @@ export function Opener() {
     // Any key, click, scroll or swipe skips it.
     const skip = () => setState('leaving')
     const events = ['keydown', 'pointerdown', 'wheel', 'touchmove']
-    // Wait a beat before listening, so the click on "Play the film" doesn't skip it at once.
     const listen = setTimeout(() => events.forEach((e) => window.addEventListener(e, skip, { passive: true })), 300)
     return () => {
       stopFilm()
@@ -265,7 +231,7 @@ export function Opener() {
       events.forEach((e) => window.removeEventListener(e, skip))
       storyState.holdIntro = false
     }
-  }, [state, take])
+  }, [state])
 
   useEffect(() => {
     if (state !== 'leaving') return
@@ -275,7 +241,7 @@ export function Opener() {
 
   if (state === 'done') return null
   return (
-    <div key={take} className={`film ${state === 'leaving' ? 'is-leaving' : ''}`}>
+    <div className={`film ${state === 'leaving' ? 'is-leaving' : ''}`}>
       <div className="film__frame" aria-hidden="true">
         <div className="film__haze" />
         <Floodlight side="left" />

@@ -229,6 +229,35 @@ The site was rewritten to sell, not just inform. One rule held throughout: **eve
   - The dashboard shows experience as "Not given".
 - **The full regression pass** still runs clean at three sizes: one h1 per page, never wider than the screen, 0 axe violations, and the 320 px menu and booking buttons work.
 
+## The promo film and The Vision Test
+
+Checked on a production build before publishing.
+
+**The promo film:**
+
+- Both cuts decode in Chrome: 33.6 s, 1920 × 1080 and 1080 × 1920, H.264 video with an AAC audio track.
+- Frames sampled from the encoded files match the design.
+- The server streams them in chunks (HTTP 206), so playback starts without downloading the whole file.
+- **The player** passes 10 of 10 checks:
+  - The hero, footer and teaser all open it.
+  - It plays with sound after a tap.
+  - Escape and Close both work.
+  - A `?film` link opens it muted, and the 8-second opener doesn't play over it.
+  - Phones held upright get the 9:16 cut.
+
+**The game:**
+
+- **A bot that scans and watches the ball in** completes 13–14 of 15 passes in a match.
+- **A bot that never checks its shoulders** completes none (7 intercepted, 8 tackled). So the game rewards scanning.
+- **Passes to a visible teammate always arrive.** An early version led runners for the whole flight even when their run had ended; that was fixed.
+- **On production** (smoke test): the clock runs, the pitch takes keyboard focus, results show after 60 seconds, and the WhatsApp share carries the score and a link back.
+- **Accessibility:** 0 axe violations on `/play` at desktop and phone size. (Fixed: the scoreboard had been hidden from screen readers while containing the focusable Sound button.)
+
+**Layout and speed:**
+
+- Nothing overflows on any page at 11 widths from 320 to 1440 px, including the nav with its new Play link.
+- Lighthouse: home 98 on phones and 100 on desktop, `/play` 98 on phones. Accessibility, best practices and SEO are 100.
+
 ## Not covered
 
 - Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.

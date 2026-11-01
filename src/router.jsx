@@ -28,6 +28,8 @@ export const usePath = () => useSyncExternalStore(subscribe, currentPath)
 // Set by the layout so navigation can scroll through Lenis when smooth scrolling is on.
 let scroller = null
 export const setScroller = (s) => (scroller = s)
+/** Holds the page still (or lets it scroll again) while something like the film player is open. */
+export const holdScroll = (hold) => (hold ? scroller?.stop() : scroller?.start())
 
 export function scrollToId(id, { immediate = false } = {}) {
   const el = document.getElementById(id)

@@ -30,6 +30,11 @@ export const pages = [
     description: `${academy.philosophy.name}: guided self-discovery instead of rigid drills, so players learn to read the game and make their own decisions.`,
   },
   {
+    path: '/play',
+    title: `The Vision Test | ${SUFFIX}`,
+    description: 'You only see what you look at. Check your shoulders, spot the press and find the open pass. A one-minute football game from Vision Football Academy, Surat.',
+  },
+  {
     path: '/visit',
     title: `Book a visit | ${SUFFIX}`,
     description: `See a session at Boghara School Ground, Adajan, Surat. Training Monday to Friday, 6 to 9 PM. ${rated} on Google. Book a visit.`,

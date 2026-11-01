@@ -11,8 +11,9 @@ import MethodPage from './pages/MethodPage.jsx'
 import VisitPage from './pages/VisitPage.jsx'
 import NotFound from './NotFound.jsx'
 
-// The pages are light and load with the app; only the 3D scene and the staff dashboard are split off.
+// The pages are light and load with the app; the 3D scene, the game and the staff dashboard are split off.
 const Admin = lazy(() => import('./admin/Admin.jsx'))
+const PlayPage = lazy(() => import('./pages/PlayPage.jsx'))
 
 function page(path) {
   if (path === '/') return <Home />
@@ -21,6 +22,7 @@ function page(path) {
   if (program) return <ProgramPage id={program[1]} />
   if (path === '/method') return <MethodPage />
   if (path === '/visit') return <VisitPage />
+  if (path === '/play') return <PlayPage />
   return <NotFound />
 }
 

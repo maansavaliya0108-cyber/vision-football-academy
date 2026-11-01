@@ -1,8 +1,8 @@
 import { academy } from '../../shared/academy.js'
 import { STATIC } from '../config'
 import { Link } from '../router'
+import { openFilm } from './FilmPlayer'
 import { Logo } from './Logo'
-import { playFilm } from './Opener'
 
 export function Footer() {
   const { address, phone } = academy
@@ -35,7 +35,7 @@ export function Footer() {
               <Link to="/visit#join">Book a visit</Link>
             </li>
             <li>
-              <button type="button" className="footer__film" onClick={playFilm}>
+              <button type="button" className="footer__film" onClick={openFilm}>
                 Watch the film
               </button>
             </li>

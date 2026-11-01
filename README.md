@@ -17,6 +17,7 @@ Website and enquiry system for Vision Football Academy, Boghara School Ground, A
 | `/programs/recreational`, `/academy`, `/personal`, `/goalkeeping`, `/international` | One page per program: facts, focus, the four-part method, the match pathway (squads and immersion), links to the neighbouring programs, and the enquiry form with that program already chosen |
 | `/method` | Cerebral Player Development: rigid drills compared with guided self-discovery, the objective, the four areas, the pathway and the reviews |
 | `/visit` | Timings, the ground and map, questions parents ask and the enquiry form |
+| `/play` | The Vision Test, a one-minute football scanning game (see below) |
 | `/admin` | Staff dashboard (server version only) |
 
 Each page has its own title, description, canonical link and share preview, written into the HTML by the server (or the static build) so search engines and WhatsApp see them without running JavaScript. The list lives in [`shared/pages.js`](shared/pages.js).
@@ -42,7 +43,7 @@ On phones, a Call / WhatsApp / Book a visit bar stays at the bottom of the scree
 
 ### The opening film
 
-An eight-second promo, cut like a sports-brand ad, opens the site on a first visit:
+An eight-second intro, cut like a sports-brand ad, opens the site on a first visit:
 
 1. **The open:** two stadium floodlight banks flicker on in the dark, inside letterbox bars.
 2. **The cards** cut in one after another:
@@ -55,12 +56,62 @@ An eight-second promo, cut like a sports-brand ad, opens the site on a first vis
 
 Every line comes from `shared/academy.js`; there are no claims beyond the academy's confirmed facts.
 
-- **When it plays by itself:** once per visitor, remembered in the browser. Never for links to a section such as `/#join`, never when arriving from another page, and never when the device is set to reduce motion.
+- **When it plays:** once per visitor, remembered in the browser. Never for links to a section such as `/#join` or a shared `?film` link, never when arriving from another page, and never when the device is set to reduce motion.
 - **Skipping:** the Skip intro button, any key, a click, or a scroll.
-- **Watching it any time:** press **Watch the film** in the hero, or **Watch the film** in the footer on any page, which goes to the home page and plays it. A press always plays the full film, even on a device set to reduce motion, because the visitor chose it.
-- **Sharing:** add `?film` to the address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?film`. That link always opens with the film, which makes it a good one for WhatsApp and Instagram.
 
 It lives in [`src/site/Opener.jsx`](src/site/Opener.jsx) (timing, the light streaks) and the "The film" section of [`src/styles/site.css`](src/styles/site.css) (cards, lights, letterbox). The two share one clock, so change their timings together.
+
+### The promo film (33 seconds)
+
+A real video file, for the site and for posting: [`public/media/vision-promo-16x9.mp4`](public/media/vision-promo-16x9.mp4) (1920 × 1080, for the site and YouTube) and [`public/media/vision-promo-9x16.mp4`](public/media/vision-promo-9x16.mp4) (1080 × 1920, for Instagram Reels and WhatsApp Status). It is cut from the same particle scene as the site, with title cards and sound design:
+
+1. Floodlights snap on: "Every weekday. 6 PM."
+2. The ball of light forms: "Where players learn to think."
+3. It bursts, and the particles build "THINK.": "Coaches set the problem. Players find the answer."
+4. The pitch draws itself: "See the pressure before the ball arrives."
+5. The pass in slow motion: "Think one pass ahead."
+6. Rapid cuts of the four areas: Technical, Physical, Tactical and Mental.
+7. The verdict: 5.0, rated by Surat families.
+8. The pathway: training ground, district trials, youth cups, state scouts.
+9. The VISION wordmark lands, then Book a visit, the phone number, and Mon–Fri · 6–9 PM · Boghara School Ground.
+
+Every line comes from `shared/academy.js`. The sound is synthesized (impacts, whooshes, risers and a low drone), so there's no music licence to worry about.
+
+- **On the site:** **Watch the film** in the hero, the film section on the home page, and **Watch the film** in every page footer all open it in a full-screen player. It plays with sound, and phones held upright get the 9:16 cut. The player has Book a visit and download links for both cuts.
+- **Sharing:** add `?film` to any address, for example `https://maansavaliya0108-cyber.github.io/vision-football-academy/?film`, and the page opens straight into the film. Browsers start it muted until the viewer taps for sound.
+- **Changing it:** the film is rendered from [`promo/main.js`](promo/main.js) (the timeline, camera, cards and soundtrack). With the dev server running:
+
+```bash
+npm run promo
+```
+
+That renders both cuts and their posters into `public/media` in about 15 seconds, using Chrome's own video encoder. To check frames without rendering the whole film, use `npm run promo -- --stills <folder>`.
+
+### The Vision Test (the game)
+
+A one-minute football scanning game at `/play`, built on the academy's own method: "see the pressure before the ball arrives" and "think one pass ahead".
+
+You are the pivot in the centre circle, seen from above, and **you only see what you look at**. Everything outside your vision cone is dark.
+
+- **The ball comes from behind,** and a presser closes in from your blind side, so you have to check your shoulders.
+- **Memory ghosts:** what you look away from stays as a dashed outline where you last saw it. Ghosts fade and go stale, because players keep moving.
+- **Time slows** for a beat as the ball arrives.
+- **Passing:**
+  - Pass to the open teammate before you're tackled.
+  - A pass into a covered lane is intercepted, and a pass to an out-of-date memory goes to empty grass.
+  - From level 2, a cover defender can switch lanes after the ball is played, so an early look may be wrong by the time it arrives.
+
+Scoring rewards completed passes, quick decisions, shoulder checks before the ball arrives and spotting the press early, with a combo multiplier for passes in a row. The result shows a Vision score, a rating (Head down, Checking, Scanning, One pass ahead) and the stats behind it. It can be shared on WhatsApp, and closes with Book a visit.
+
+**Controls:**
+
+| Device | Look around | Pass |
+| --- | --- | --- |
+| Desktop | Move the mouse | Click a teammate |
+| Phone | Drag a finger | Tap a teammate (one thumb looks, the other passes) |
+| Keyboard | ← and → | 1–4 or Space |
+
+The engine is [`src/game/visionTest.js`](src/game/visionTest.js): a plain canvas, with synthesized sound effects and no images or libraries. The page is [`src/pages/PlayPage.jsx`](src/pages/PlayPage.jsx).
 
 ## Run it locally
 

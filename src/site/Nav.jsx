@@ -9,6 +9,7 @@ const links = [
   { to: '/programs', label: 'Programs' },
   { to: '/visit', label: 'Timings and ground' },
   { to: '/visit#faq', label: 'Questions' },
+  { to: '/play', label: 'Play' },
 ]
 
 /** Pages with the enquiry form on them can jump straight to it; the rest go to the visit page. */

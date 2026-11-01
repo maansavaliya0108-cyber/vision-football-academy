@@ -3,6 +3,7 @@ import Lenis from 'lenis'
 import '../styles/site.css'
 import { setScroller } from '../router'
 import { Nav } from './Nav'
+import { FilmPlayer } from './FilmPlayer'
 import { Footer } from './Footer'
 import { QuickBar } from './QuickBar'
 
@@ -49,6 +50,7 @@ export function Layout({ path, children }) {
       </main>
       <Footer />
       <QuickBar path={path} />
+      <FilmPlayer />
     </>
   )
 }

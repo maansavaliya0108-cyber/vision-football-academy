@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Promo renderer | Vision Football Academy</title>
+    <style>
+      body {
+        margin: 0;
+        background: #111;
+        color: #ccc;
+        font: 14px system-ui, sans-serif;
+      }
+      canvas {
+        display: block;
+        max-width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Development tool, not part of the site: npm run promo drives this page to render the video. -->
+    <p id="status">Loading…</p>
+    <canvas id="frame"></canvas>
+    <script type="module" src="./main.js"></script>
+  </body>
+</html>
