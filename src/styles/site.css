@@ -3357,7 +3357,8 @@
   position: absolute;
   inset: 0;
   display: grid;
-  align-content: center;
+  align-content: start;
+  align-content: safe center; /* tall content scrolls from its top instead of being cut off */
   justify-items: center;
   gap: 1rem;
   padding: clamp(1.25rem, 4vw, 3rem);
@@ -3475,13 +3476,192 @@
   gap: 0.75rem 1.25rem;
 }
 .game__book {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
   font-weight: 700;
   color: var(--volt);
+  text-decoration: underline;
   text-underline-offset: 4px;
+  cursor: pointer;
+}
+.game__sound--after {
+  margin-left: 0;
+}
+.game__tier span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-stretch: 100%;
+  text-transform: none;
+  color: var(--smoke);
+}
+/* Practice: pick a level. */
+.game__practice {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  margin: 0.3rem 0 0;
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-m);
+  max-width: 44rem;
+}
+.game__practice legend {
+  padding: 0 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--smoke);
+}
+.game__levels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+}
+.game__lvl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.2rem;
+  padding: 0 0.85rem 0 0.35rem;
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--bone);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.game__lvl span {
+  display: grid;
+  place-items: center;
+  width: 1.55rem;
+  height: 1.55rem;
+  border-radius: 50%;
+  background: var(--graphite);
+  font-size: 0.78rem;
+}
+.game__lvl[aria-pressed='true'] {
+  border-color: var(--volt);
+  background: rgba(215, 255, 58, 0.1);
+}
+.game__lvl[aria-pressed='true'] span {
+  background: var(--volt);
+  color: var(--ink);
+}
+.game__lvl-adds {
+  font-size: 0.85rem;
+  color: var(--smoke);
+}
+/* Results: the score and what next on the left, how you played on the right. */
+.game__result-head,
+.game__result-body {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+@media (min-width: 900px) {
+  .game__rules {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem 2.2rem;
+    max-width: 58rem;
+  }
+  .game__panel--result {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-items: center;
+    column-gap: clamp(1.5rem, 3vw, 3rem);
+  }
+  .game__panel--result .game__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+  }
+  .game__panel--result .game__stats div {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.6rem 0.85rem;
+    text-align: left;
+  }
+  .game__panel--result .game__stats dd {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+}
+/* Results: where you looked, and what to work on. */
+.game__review {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem 1.75rem;
+  width: min(100%, 44rem);
+  text-align: left;
+}
+.vmap {
+  flex: none;
+  margin: 0;
+  text-align: center;
+}
+.vmap svg {
+  display: block;
+  width: 8.5rem;
+  height: 8.5rem;
+  margin: 0 auto 0.3rem;
+}
+.vmap__ring {
+  fill: none;
+  stroke: var(--line-strong);
+}
+.vmap__slice {
+  fill: var(--volt);
+  stroke: #0b0d0c;
+  stroke-width: 1;
+}
+.vmap__you {
+  fill: var(--bone);
+}
+.vmap__label {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-anchor: middle;
+  fill: var(--smoke);
+}
+.vmap figcaption {
+  max-width: 9rem;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: var(--smoke);
+}
+.vmap figcaption strong {
+  color: var(--bone);
+}
+.game__tip {
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--bone);
+}
+.game__tip span {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--volt);
 }
 @media (max-width: 700px) {
   .game__pitch {
     height: clamp(460px, 76svh, 720px);
+  }
+  .game__review {
+    flex-direction: column;
+    text-align: center;
+  }
+  .game__level {
+    flex-basis: 100%;
+    order: 5;
   }
   .game__stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3492,6 +3672,96 @@
   }
   .game__time {
     font-size: 1.3rem;
+  }
+}
+
+/* The how-to-play video, with its chapters. */
+.tutorial {
+  background: var(--void);
+  padding-block: clamp(3rem, 7vw, 6rem);
+  border-top: 1px solid var(--line);
+}
+.tutorial__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.8fr);
+  grid-template-areas:
+    'copy video'
+    'chapters chapters';
+  gap: clamp(1.5rem, 3vw, 2.5rem) clamp(2rem, 4vw, 3.5rem);
+  align-items: center;
+}
+.tutorial__copy {
+  grid-area: copy;
+}
+.tutorial__eyebrow {
+  margin-bottom: 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--volt);
+}
+.tutorial__copy .section-title {
+  font-size: var(--step-4);
+  font-size: min(var(--step-4), (100vw - 2 * var(--gutter)) / (var(--fit, 1) * 1.04));
+}
+.tutorial__body {
+  margin-top: 1.1rem;
+  font-size: var(--step-1);
+  line-height: 1.45;
+  color: var(--smoke);
+}
+.tutorial__video {
+  grid-area: video;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-m);
+  background: #000;
+}
+.tutorial__chapters {
+  grid-area: chapters;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 0.35rem 1.25rem;
+  margin: 0;
+  padding: 0;
+}
+.tutorial__chapters button {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.55rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: none;
+  color: var(--bone);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+.tutorial__chapters button:hover {
+  color: var(--volt);
+}
+.tutorial__at {
+  flex: none;
+  min-width: 2.6rem;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--ash);
+}
+@media (max-width: 860px) {
+  .tutorial__grid {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'copy'
+      'video'
+      'chapters';
   }
 }
 

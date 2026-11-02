@@ -18,7 +18,8 @@
     "dev:stop": "node scripts/dev-stop.mjs",
     "images": "node scripts/make-images.mjs",
     "og": "node scripts/capture-og.mjs",
-    "promo": "node scripts/render-promo.mjs"
+    "promo": "node scripts/render-promo.mjs",
+    "tutorial": "node scripts/render-tutorial.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.2",

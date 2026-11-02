@@ -258,6 +258,41 @@ Checked on a production build before publishing.
 - Nothing overflows on any page at 11 widths from 320 to 1440 px, including the nav with its new Play link.
 - Lighthouse: home 98 on phones and 100 on desktop, `/play` 98 on phones. Accessibility, best practices and SEO are 100.
 
+## The advanced game and its tutorial
+
+Checked on a production build before publishing.
+
+**The game, played by bots** (six full matches each, through the engine's manual mode):
+
+| Bot | Passes completed | Level reached | Score |
+| --- | --- | --- | --- |
+| Checks both shoulders | 12.8 of 14.7 | 5 | 3,446 |
+| Plays first time | 11.2 of 15.2, all first time | 4.3 | 3,552 |
+| Never checks | 5.7 of 13.8 (tackled 3.8, heavy touch on 13.5) | 2.7 | 845 |
+
+In practice at levels 4 and 5, the scanning bot completes about 80%, while the bot that never checks completes about 5% and is tackled on almost every ball. So scanning decides the result at every level.
+
+- **Fixed: watching the ball in never counted.** The ball counted as seen once it was within 2.2 m of you, so a heavy touch could never happen; this was also true in the first version. Now only actually looking at the ball counts.
+- **Fixed: two messages overlapped.** "No time: you did not see the press" printed on top of "Tackled".
+- **The game page passes 12 of 12 checks:**
+  - The five named levels can be practised.
+  - Practice shows its HUD and End practice, and ending it shows the results, vision map and coach's note.
+  - A full one-minute match climbs levels and ends with score, rating, level reached, the WhatsApp share and best score.
+  - Each tutorial chapter button plays the video from that chapter.
+  - On a 390 px phone the start screen begins with Start the match and nothing is wider than the screen.
+  - There are no page errors.
+
+**The tutorial video:**
+
+- The file decodes in Chrome: 160.1 s, 1920 × 1080, H.264 with an AAC track carrying the game's own sounds (93 of them) over a soft music bed.
+- Frames sampled every 5 seconds from the encoded file show each chapter's rule happening, as listed.
+
+**Layout, accessibility and speed:**
+
+- Nothing overflows on any page at 11 widths.
+- 0 axe violations on `/play`, at desktop and phone size, on the start screen, while practising, and on the results screen.
+- Lighthouse on `/play`: 96 on phones and 100 on desktop. Accessibility, best practices and SEO are 100.
+
 ## Not covered
 
 - Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.

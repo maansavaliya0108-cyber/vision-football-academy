@@ -96,14 +96,27 @@ To reach it: **Play the game** in the top menu, the **Play the game** button und
 You are the pivot in the centre circle, seen from above, and **you only see what you look at**. Everything outside your vision cone is dark.
 
 - **The ball comes from behind,** and a presser closes in from your blind side, so you have to check your shoulders.
+- **Watch it in:** look at the ball just before it arrives, or your first touch is heavy and you lose a moment.
 - **Memory ghosts:** what you look away from stays as a dashed outline where you last saw it. Ghosts fade and go stale, because players keep moving.
-- **Time slows** for a beat as the ball arrives.
+- **Awareness buys time:** spot every presser before the ball arrives and time slows as it reaches you. Miss one and there is no slow motion.
 - **Passing:**
   - Pass to the open teammate before you're tackled.
   - A pass into a covered lane is intercepted, and a pass to an out-of-date memory goes to empty grass.
-  - From level 2, a cover defender can switch lanes after the ball is played, so an early look may be wrong by the time it arrives.
+  - **First-time passes:** choose your pass while the ball is still coming (a dashed ring lines it up). If you watched the ball in, you play it first time for 60 extra points.
 
-Scoring rewards completed passes, quick decisions, shoulder checks before the ball arrives and spotting the press early, with a combo multiplier for passes in a row. The result shows a Vision score, a rating (Head down, Checking, Scanning, One pass ahead) and the stats behind it. It can be shared on WhatsApp, and closes with Book a visit.
+**Five levels,** named after the academy's pathway. A match climbs one every three completed passes:
+
+| Level | Name | What it adds |
+| --- | --- | --- |
+| 1 | Training ground | Three runners ahead and one presser behind |
+| 2 | Match time | The cover can switch lanes after the ball is played |
+| 3 | District trials | Four runners, and traffic in midfield |
+| 4 | Youth cups and leagues | A second presser, from your other side |
+| 5 | State scouts | Quicker pressers, and memories fade sooner |
+
+**Two modes:** a one-minute **match** (scored, climbing levels, your best remembered on the device) and **practice** (pick any level, no clock, coaching tips as you play, End practice when you're done).
+
+**Scoring:** 100 for a completed pass, up to 60 for a quick decision, 15 for each shoulder check before the ball (up to 4), 20 for spotting every presser, 60 for a first-time pass, and ×1.1 for each pass in a row (up to ×2.0). The result shows a Vision score, a rating (Head down, Checking, Scanning, One pass ahead), the level reached, eight stats (including first-time passes, interceptions, tackles and passes to old memories), a **vision map** of where you looked, and a **coach's note** on what to work on next. It can be shared on WhatsApp, and closes with Book a visit.
 
 **Controls:**
 
@@ -113,7 +126,21 @@ Scoring rewards completed passes, quick decisions, shoulder checks before the ba
 | Phone | Drag a finger | Tap a teammate (one thumb looks, the other passes) |
 | Keyboard | ← and → | 1–4 or Space |
 
-The engine is [`src/game/visionTest.js`](src/game/visionTest.js): a plain canvas, with synthesized sound effects and no images or libraries. The page is [`src/pages/PlayPage.jsx`](src/pages/PlayPage.jsx).
+**Fair at every level:** bots play full matches through the engine's manual mode. A bot that checks both shoulders completes about 87% of its passes and reaches level 5. A bot that never checks gets a heavy touch on almost every ball, is tackled again and again, and completes about 40% (about 5% at levels 4 and 5).
+
+### How to play (the tutorial video)
+
+[`public/media/vision-test-tutorial.mp4`](public/media/vision-test-tutorial.mp4): 2 minutes 40 seconds, 1920 × 1080, with sound, in 18 chapters. Each rule is played out in the real game: the controls, the vision cone, memories, the ball and the heavy touch, passing, covered lanes, the presser and the shoulder check, stale memories, first-time passes, all five levels, scoring, the results screen and practice. Labels and an on-screen cursor show what is happening, and a panel explains each step. It sits on `/play` under the game, with a list of chapters to jump to, and **Watch how to play** on the game's start screen opens it.
+
+It is rendered from [`tutorial/main.js`](tutorial/main.js), which drives the game engine with scripted rounds. The chapter list lives in [`src/game/tutorialChapters.js`](src/game/tutorialChapters.js), shared with the page. With the dev server running:
+
+```bash
+npm run tutorial
+```
+
+That renders the video and its poster into `public/media` in about 30 seconds. To check frames first, use `npm run tutorial -- --stills <folder>`, optionally followed by times in seconds.
+
+The engine is [`src/game/visionTest.js`](src/game/visionTest.js): a plain canvas, with synthesized sound effects and no images or libraries. The rating and coach's note are in [`src/game/review.js`](src/game/review.js), and the page is [`src/pages/PlayPage.jsx`](src/pages/PlayPage.jsx).
 
 ## Run it locally
 
