@@ -6,6 +6,7 @@ import { useTrainingStatus } from './useTrainingStatus'
 import { PhoneIcon, Stars } from './icons'
 import { Opener } from './Opener'
 import { PROMO, openFilm } from './FilmPlayer'
+import { Link } from '../router'
 
 const StoryCanvas = lazy(() => import('../three/ParticleCanvas.jsx'))
 // Remembers a visitor's choice to see the full animation on a device set to reduce motion.
@@ -177,6 +178,18 @@ export function Story() {
                   <span className="watch__length">{PROMO.seconds} sec</span>
                 </span>
               </button>
+              <Link className="watch" to="/play">
+                <span className="watch__icon watch__icon--game" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 18 18">
+                    <path d="M9 10 15.5 3.5A9 9 0 0 0 2.5 3.5Z" fill="currentColor" opacity="0.55" />
+                    <circle cx="9" cy="11" r="2.6" fill="currentColor" />
+                  </svg>
+                </span>
+                <span className="watch__text">
+                  Play the game
+                  <span className="watch__length">1 min</span>
+                </span>
+              </Link>
               {gl && device.prefersReduced && (
                 <button type="button" className="motion-switch" aria-pressed={motionOn} onClick={toggleMotion}>
                   <span className="motion-switch__track" aria-hidden="true" />

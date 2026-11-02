@@ -39,6 +39,9 @@ export function Footer() {
                 Watch the film
               </button>
             </li>
+            <li>
+              <Link to="/play">Play the game</Link>
+            </li>
           </ul>
         </nav>
         <div>

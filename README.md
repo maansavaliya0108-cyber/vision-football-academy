@@ -91,6 +91,8 @@ That renders both cuts and their posters into `public/media` in about 15 seconds
 
 A one-minute football scanning game at `/play`, built on the academy's own method: "see the pressure before the ball arrives" and "think one pass ahead".
 
+To reach it: **Play the game** in the top menu, the **Play the game** button under **Watch the film** on the home page's first screen, the game section further down the home page, and **Play the game** in every page footer.
+
 You are the pivot in the centre circle, seen from above, and **you only see what you look at**. Everything outside your vision cone is dark.
 
 - **The ball comes from behind,** and a presser closes in from your blind side, so you have to check your shoulders.
