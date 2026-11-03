@@ -93,11 +93,11 @@ A one-minute football scanning game at `/play`, built on the academy's own metho
 
 To reach it: **Play the game** in the top menu, the **Play the game** button under **Watch the film** on the home page's first screen, the game section further down the home page, and **Play the game** in every page footer.
 
-You are the pivot in the centre circle, seen from above, and **you only see what you look at**. Everything outside your vision cone is dark.
+You are the pivot in the centre circle, seen at night from a high camera behind you, and **you only see what you look at**. Your vision is a floodlight from your own eyes: everything outside its cone is dark.
 
 - **The ball comes from behind,** and a presser closes in from your blind side, so you have to check your shoulders.
 - **Watch it in:** look at the ball just before it arrives, or your first touch is heavy and you lose a moment.
-- **Memory ghosts:** what you look away from stays as a dashed outline where you last saw it. Ghosts fade and go stale, because players keep moving.
+- **Memory ghosts:** what you look away from stays as a see-through hologram, on a dashed ring, where you last saw it. Ghosts fade and go stale, because players keep moving.
 - **Awareness buys time:** spot every presser before the ball arrives and time slows as it reaches you. Miss one and there is no slow motion.
 - **Passing:**
   - Pass to the open teammate before you're tackled.
@@ -138,9 +138,30 @@ It is rendered from [`tutorial/main.js`](tutorial/main.js), which drives the gam
 npm run tutorial
 ```
 
-That renders the video and its poster into `public/media` in about 30 seconds. To check frames first, use `npm run tutorial -- --stills <folder>`, optionally followed by times in seconds.
+That renders the video and its poster into `public/media` in about 40 seconds. To check frames first, use `npm run tutorial -- --stills <folder>`, optionally followed by times in seconds.
 
-The engine is [`src/game/visionTest.js`](src/game/visionTest.js): a plain canvas, with synthesized sound effects and no images or libraries. The rating and coach's note are in [`src/game/review.js`](src/game/review.js), and the page is [`src/pages/PlayPage.jsx`](src/pages/PlayPage.jsx).
+The rules are in [`src/game/visionTest.js`](src/game/visionTest.js), with synthesized sound effects and no image or sound files. The rating and coach's note are in [`src/game/review.js`](src/game/review.js), and the page is [`src/pages/PlayPage.jsx`](src/pages/PlayPage.jsx).
+
+**The graphics** are drawn in 3D by [`src/game/stage3d.js`](src/game/stage3d.js), with three.js:
+
+- **The pitch at night:** mown stripes, grass texture and chalk lines, lit only inside your cone. Haze and dust hang in the beam, and its edge catches a thin volt line.
+- **The players:** small 3D footballers in kit. They run, turn their heads to the ball and strike their passes, and cast long shadows away from your gaze. Teammates wear the academy's volt, with their numbers overhead; opponents wear bone, and pressers red. You turn your head first and your body follows, so every shoulder check shows.
+- **Memories:** see-through holograms of the players, frozen where you last saw them and fading.
+- **The moments:**
+  - The ball rolls and leaves a trail of light.
+  - A completed pass bursts in volt.
+  - An interception or a tackle flashes red.
+  - Slow motion drains the colour and closes in like a replay.
+  - A new level sweeps a band of light up the pitch.
+- **Post-processing:** glow, filmic tone, a vignette and film grain.
+
+What is lit is always exactly what the rules say you can see: the stage only draws what the game hands it.
+
+**Speed and fallbacks:**
+
+- The 3D code loads at the visitor's first scroll, touch, key or mouse move, so it never slows the page's first load. A match started before it arrives waits for it, for up to 2.5 seconds.
+- Phones start one quality step down, and any device that runs slow steps down again: lower resolution, then no glow.
+- Without WebGL, the game draws itself flat, as before.
 
 ## Run it locally
 

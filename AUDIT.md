@@ -293,8 +293,29 @@ In practice at levels 4 and 5, the scanning bot completes about 80%, while the b
 - 0 axe violations on `/play`, at desktop and phone size, on the start screen, while practising, and on the results screen.
 - Lighthouse on `/play`: 96 on phones and 100 on desktop. Accessibility, best practices and SEO are 100.
 
+## The 3D graphics
+
+The game is now drawn in 3D (`src/game/stage3d.js`): a night pitch lit only inside your vision cone, animated players in kit, hologram memories, and glow and particle effects. Checked before publishing.
+
+- **The rules did not change.** The same bots, six matches each, score exactly as before: 3,446, 3,552 and 845. The game page still passes 12 of 12 checks.
+- **Clicks land on the right player.** A real mouse click on a teammate in the 3D view passed to them, 3 times out of 3.
+- **Speed while playing:** a steady 60 frames a second in Chrome on an Apple M4 Mac:
+  - at desktop size (1342 × 666 at 2× pixels), on the top quality;
+  - at phone size (353 × 641 at 3×), on the phone quality.
+
+  The game steps its quality down by itself if frames run slow.
+- **Fixed: the 3D slowed the page's first load.** Loading it as soon as the pitch was near the screen dropped Lighthouse on phones to 68, with 760 ms of blocking. It now loads at the visitor's first scroll, touch, key or mouse move. Lighthouse on `/play` is back to 96 on phones and 100 on desktop, with no blocking time, and 100 for accessibility, best practices and SEO.
+- **Without WebGL** the game falls back to the flat drawing, which still renders.
+- **Layout and accessibility:**
+  - nothing overflows at 11 widths;
+  - 0 axe violations on `/play` at desktop and phone size, on the start screen, while practising and on the results.
+- **The tutorial video was re-rendered with the new look.** It decodes as 160.1 s, 1920 × 1080, with the game's sounds.
+  - It is 53.7 MB, up from 35 MB, even after lowering the bitrate from 3.5 to 2.6 Mbit/s. The video streams, so visitors only download what they watch.
+  - Fixed: labels overlapped in two chapters.
+  - Fixed: the last chapter ended on a tackle; it now ends on a completed pass.
+
 ## Not covered
 
-- Real devices: iPhone Safari and Android Chrome. Testing used desktop Chrome, with phone sizes emulated.
+- Real devices: iPhone Safari and Android Chrome, including how the 3D game runs on their graphics chips. Testing used desktop Chrome, with phone sizes emulated.
 - A walkthrough with a screen reader (VoiceOver or TalkBack). The automated checks cover names, roles, focus and contrast, but not how the pages sound read aloud.
 - Security headers on GitHub Pages. GitHub's own hosting doesn't send the headers listed in audit 5; those apply when the site runs on its own Node server.

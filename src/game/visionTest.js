@@ -56,6 +56,7 @@ const clampTallX = (x) => Math.max(-12.5, Math.min(12.5, x))
 const clampY = (y) => Math.max(-20, Math.min(4, y))
 const angleOf = (x, y) => Math.atan2(x, -y)
 const wrap = (a) => Math.atan2(Math.sin(a), Math.cos(a))
+const smoothStep = (v) => v * v * (3 - 2 * v)
 function toSegment(p, a, b) {
   const dx = b.x - a.x
   const dy = b.y - a.y
@@ -125,6 +126,16 @@ export function soundInto(a, dest, name, t) {
   if (name === 'tick') tone(1200, 0, 0.05, { type: 'square', gain: 0.04 })
 }
 
+// The 3D drawing (stage3d.js, with three.js) loads on its own, after the page: until it arrives, or
+// where WebGL is missing, the game draws itself flat.
+let Stage = null
+let loading = null
+/** Loads the 3D drawing. Games made after it resolves start in 3D; ones already running switch over. */
+export function loadGraphics() {
+  loading ??= import('./stage3d.js').then((m) => (Stage = m)).catch(() => null)
+  return loading
+}
+
 /** The live game's sound: soundInto on the page's own audio context. */
 function createSound() {
   let ac = null
@@ -154,7 +165,7 @@ function createSound() {
  */
 export function createVisionTest(
   canvas,
-  { onHud, onEvent, onEnd, reducedMotion = false, manual = false, sound: customSound = null },
+  { onHud, onEvent, onEnd, reducedMotion = false, manual = false, sound: customSound = null, render = true, graphics = true },
 ) {
   const ctx = canvas.getContext('2d')
   const fog = document.createElement('canvas')
@@ -167,6 +178,12 @@ export function createVisionTest(
   let ox = 0
   let oy = 0
   let tall = false
+  let unit = 1 // pixels per metre where you stand, for sizing labels
+  let gfx = null // the 3D stage, once loaded
+  let vt = 0 // seconds of drawing time, for the light, the dust and effects
+  let destroyed = false
+  let slowFrames = 0 // for lowering the 3D quality when frames run slow
+  let frames = 0
 
   let S = null // the match
   let random = Math.random
@@ -195,11 +212,29 @@ export function createVisionTest(
     scale = Math.min(W / (view.right - view.left), H / (view.bottom - view.top))
     ox = W / 2
     oy = H / 2 - ((view.top + view.bottom) / 2) * scale
-    if (!S) drawIdle()
+    gfx?.setSize(W, H, manual ? 1 : Math.min(window.devicePixelRatio || 1, 2), tall)
+    unit = gfx ? gfx.scaleAt(0, 0) : scale
+    redraw()
   }
+  const redraw = () => (!render ? null : S ? draw() : drawIdle())
   const sx = (x) => ox + x * scale
   const sy = (y) => oy + y * scale
-  const toWorld = (px, py) => ({ x: (px - ox) / scale, y: (py - oy) / scale })
+  // Above the horizon of the 3D view, a point counts as far up the pitch.
+  const toWorld = (px, py) => (gfx ? (gfx.unproject(px, py) ?? { x: 0, y: -60 }) : { x: (px - ox) / scale, y: (py - oy) / scale })
+
+  /** Switches to the 3D drawing, if it has loaded and WebGL works here. */
+  function upgrade() {
+    if (gfx || destroyed || !Stage || !graphics) return
+    try {
+      // Touch screens start a step down; anything that then runs slow steps down again (see frame).
+      const phone = !manual && window.matchMedia('(hover: none) and (pointer: coarse)').matches
+      gfx = Stage.createStage({ quality: manual ? 'high' : phone ? 'medium' : 'high', grain: !manual })
+      resize()
+    } catch {
+      gfx = null
+    }
+  }
+  const fx = (name, x, y) => gfx?.fx(name, x, y)
 
   // ---------- The match ----------
 
@@ -471,6 +506,8 @@ export function createVisionTest(
         S.streak = 0
         S.shake = reducedMotion ? 0 : 0.35
         sound.play('bad')
+        fx('tackled')
+        hurt = reducedMotion ? 0 : 1
         toast('Tackled', 0, -1.5, COLORS.danger, true)
         if (R.pressers.some((P) => !P.seenBeforeBall)) toast('Check your shoulder before the ball arrives', 0, 1.6, COLORS.bone)
         else hint('You saw them: pass sooner, as soon as the ball arrives')
@@ -487,6 +524,7 @@ export function createVisionTest(
         S.stats.intercepted++
         S.streak = 0
         sound.play('bad')
+        fx('intercepted', thief.x, thief.y)
         toast('Intercepted', thief.x, thief.y - 1.4, COLORS.danger, true)
         hint('Look along the lane, not just at the player: find the one nobody is in')
         finishRound('intercepted', 'Intercepted. That lane was covered.')
@@ -497,6 +535,7 @@ export function createVisionTest(
           S.stats.misplaced++
           S.streak = 0
           sound.play('bad')
+          fx('misplaced', B.x, B.y)
           toast('They had moved', B.x, B.y - 1.4, COLORS.danger, true)
           hint('Memories go stale: look again before you pass')
           finishRound('misplaced', 'Misplaced. You passed to where they were, not where they are.')
@@ -517,6 +556,7 @@ export function createVisionTest(
     if (R.composed) S.stats.pressSeen++
     S.stats.checksBefore.push(S.checks.filter((c) => c > S.clock - 3).length)
     sound.play('receive')
+    fx('receive')
     if (!clean) {
       S.stats.heavy++
       toast('Heavy touch: watch it in', 0, 1.6, COLORS.bone)
@@ -555,6 +595,7 @@ export function createVisionTest(
     S.stats.decisions.push(decision)
     if (R.firstTime) S.stats.firstTime++
     sound.play(R.firstTime ? 'first' : 'good')
+    fx(R.firstTime ? 'first' : 'complete', mate.x, mate.y)
     toast(`+${points}`, mate.x, mate.y - 1.6, COLORS.volt, true)
     if (R.firstTime) toast('First time', mate.x, mate.y + 1.5, COLORS.volt)
     else if (checks >= 2) toast(`${checks} checks before the ball`, 0, 1.6, COLORS.volt)
@@ -568,6 +609,7 @@ export function createVisionTest(
       S.banner = { title: `Level ${next} · ${L.name}`, sub: L.adds, age: 0 }
       S.gap = 1.6
       sound.play('level')
+      fx('level')
       onEvent?.(`Level ${next}, ${L.name}. ${L.adds}`)
     }
   }
@@ -632,6 +674,294 @@ export function createVisionTest(
   }
 
   // ---------- Drawing ----------
+  //
+  // The 3D stage (stage3d.js) draws the pitch, the players and the light when WebGL is there; this
+  // file adds the labels over it. Without WebGL, the flat drawing below stands in.
+
+  /** Screen position of a point on the pitch, in whichever drawing is on. */
+  const P = (x, y, h = 0) => (gfx ? gfx.project(x, y, h) : { x: sx(x), y: sy(y) })
+
+  /** What the 3D stage needs for this frame: who is where, who you see, and what you remember. */
+  function view3d() {
+    const R = S?.round
+    const figures = []
+    const decals = []
+    let ball = null
+    const you = { kick: null, touch: null, hit: null }
+    if (R) {
+      const add = (e, kind, extra) => {
+        const shown = visible(e)
+        const age = e.seen ? S.clock - e.seen.at : Infinity
+        const remembered = !shown && age > 0.05 && age <= S.rules.memory
+        figures.push({
+          key: e,
+          kind,
+          x: e.x,
+          y: e.y,
+          shown,
+          ghost: remembered ? { x: e.seen.x, y: e.seen.y, alpha: 1 - age / S.rules.memory } : null,
+          ...extra,
+        })
+      }
+      add(R.passer, 'passer', { kick: R.t - R.passAt })
+      for (const m of R.mates) add(m, 'mate')
+      for (const o of R.opps) add(o, 'opp')
+      for (const p of R.pressers) add(p, 'press')
+      if (R.pass) you.kick = R.t - R.pass.at
+      if (R.receivedAt != null) you.touch = R.t - R.receivedAt
+      if (R.result === 'tackled') you.hit = R.t - R.resultAt
+      // The ball sits at the passer's feet until it is played, then is drawn only when you look at it.
+      const yours = R.phase === 'onball' || R.phase === 'passing' || R.phase === 'over'
+      let { x, y } = R.ball
+      if (R.phase === 'build' || R.phase === 'incoming') {
+        const toYou = Math.hypot(R.passer.x, R.passer.y) || 1
+        const out = Math.hypot(x - R.passer.x, y - R.passer.y)
+        if (out < 0.6) {
+          x = R.passer.x - (R.passer.x / toYou) * 0.6
+          y = R.passer.y - (R.passer.y / toYou) * 0.6
+        }
+      }
+      ball = { x, y, shown: yours || visible(R.ball), held: R.phase === 'onball', glow: R.phase === 'incoming' }
+      // The call: a teammate shouting as they play it in, so you know which way to look for the ball.
+      if (R.phase === 'incoming' && !visible(R.ball)) {
+        decals.push({
+          x: 0,
+          y: 0,
+          r: 3,
+          w: 0.24,
+          color: COLORS.volt,
+          k: 2.2,
+          alpha: 0.55 + 0.4 * Math.sin(vt * 14),
+          a0: angleOf(R.ball.x, R.ball.y),
+          len: 0.62,
+        })
+      }
+      // The first-time pass you have lined up.
+      if (R.queued && R.phase === 'incoming') {
+        const at = sighting(R.queued)
+        if (at) decals.push({ x: at.x, y: at.y, r: 1.2, w: 0.13, color: COLORS.volt, k: 2, dash: 14, spin: -vt * 0.9 })
+      }
+    }
+    return {
+      time: vt,
+      clock: S ? S.clock : 0,
+      head: S ? S.head : 0,
+      cone: S ? S.cone : 55 * DEG,
+      near: NEAR,
+      slow: !!S && S.slow > 0,
+      idle: !R,
+      ballComing: R?.phase === 'incoming',
+      reducedMotion,
+      you,
+      figures,
+      ball,
+      decals,
+    }
+  }
+
+  function draw() {
+    if (gfx?.lost) gfx = null // the browser took WebGL away: carry on flat
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    ctx.save()
+    if (S.shake > 0) ctx.translate(Math.sin(S.clock * 91) * S.shake * 8, Math.cos(S.clock * 77) * S.shake * 8)
+    if (gfx) {
+      gfx.render(view3d())
+      ctx.fillStyle = '#030404'
+      ctx.fillRect(-20, -20, W + 40, H + 40)
+      ctx.drawImage(gfx.canvas, 0, 0, W, H)
+      drawTrail()
+      drawNumbers()
+    } else drawFlat()
+    drawToasts()
+    ctx.restore()
+    drawCinema()
+    drawBanner()
+  }
+
+  // The ball's trail: a short streak of light behind it as it travels.
+  const trail = []
+  function drawTrail() {
+    const R = S.round
+    const B = R?.ball
+    const moving = R && (R.phase === 'passing' || (R.phase === 'incoming' && visible(B)))
+    if (moving) trail.push({ x: B.x, y: B.y, at: vt })
+    while (trail.length && (vt - trail[0].at > 0.22 || trail.length > 24)) trail.shift()
+    if (!moving && trail.length) trail.shift()
+    if (trail.length < 2) return
+    ctx.save()
+    ctx.globalCompositeOperation = 'lighter'
+    ctx.lineCap = 'round'
+    for (let i = 1; i < trail.length; i++) {
+      const a = P(trail[i - 1].x, trail[i - 1].y, 0.24)
+      const b = P(trail[i].x, trail[i].y, 0.24)
+      const k = i / trail.length
+      ctx.strokeStyle = R.phase === 'passing' ? `rgba(215,255,58,${0.55 * k})` : `rgba(255,255,255,${0.5 * k})`
+      ctx.lineWidth = Math.max(1.5, unit * 0.34 * k)
+      ctx.beginPath()
+      ctx.moveTo(a.x, a.y)
+      ctx.lineTo(b.x, b.y)
+      ctx.stroke()
+    }
+    ctx.restore()
+  }
+
+  // Shirt numbers over your teammates' heads (for the number keys): solid when you see them, dashed
+  // over a memory.
+  function drawNumbers() {
+    const R = S.round
+    if (!R) return
+    const s = Math.max(9, Math.min(14, unit * 0.42))
+    ctx.save()
+    ctx.font = `800 ${Math.round(s * 1.15)}px Archivo, sans-serif`
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    for (const m of R.mates) {
+      const seen = visible(m)
+      const age = m.seen ? S.clock - m.seen.at : Infinity
+      if (!seen && !(age > 0.05 && age <= S.rules.memory)) continue
+      const at = seen ? m : m.seen
+      const q = P(at.x, at.y, 3.3)
+      const p = { x: Math.max(s + 3, Math.min(W - s - 3, q.x)), y: Math.max(s + 3, q.y) }
+      ctx.globalAlpha = seen ? 1 : 0.8 * (1 - age / S.rules.memory)
+      ctx.beginPath()
+      ctx.roundRect(p.x - s, p.y - s, s * 2, s * 2, s * 0.45)
+      if (seen) {
+        ctx.fillStyle = COLORS.volt
+        ctx.fill()
+        ctx.fillStyle = '#0a0a0b'
+      } else {
+        ctx.fillStyle = 'rgba(6,6,7,0.7)'
+        ctx.fill()
+        ctx.setLineDash([3, 3])
+        ctx.strokeStyle = COLORS.volt
+        ctx.lineWidth = 1.5
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.fillStyle = COLORS.volt
+      }
+      ctx.fillText(String(m.n), p.x, p.y + 0.5)
+    }
+    ctx.restore()
+  }
+
+  function drawToasts() {
+    for (const t of S.toasts) {
+      const p = P(t.x, t.y)
+      const x = Math.max(80, Math.min(W - 80, p.x))
+      const y = p.y - t.age * 18
+      ctx.save()
+      ctx.globalAlpha = Math.max(0, 1 - t.age / 1.3)
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      if (t.big) {
+        // Big calls pop in and glow.
+        const pop = 1 + 0.45 * Math.pow(Math.max(0, 1 - t.age / 0.18), 2)
+        const size = Math.max(16, unit * 1.5) * pop
+        ctx.font = `900 ${Math.round(size)}px Archivo, sans-serif`
+        ctx.fontStretch = 'expanded'
+        const label = t.text.toUpperCase()
+        ctx.lineJoin = 'round'
+        ctx.lineWidth = Math.max(3, size * 0.16)
+        ctx.strokeStyle = 'rgba(3,4,4,0.8)'
+        ctx.strokeText(label, x, y)
+        if (gfx) {
+          ctx.shadowColor = t.color
+          ctx.shadowBlur = size * 0.6
+        }
+        ctx.fillStyle = t.color
+        ctx.fillText(label, x, y)
+      } else {
+        const size = Math.max(11, unit * 0.85)
+        ctx.font = `700 ${Math.round(size)}px Archivo, sans-serif`
+        if (gfx) {
+          // A dark tag behind small text, so it reads over the lit turf.
+          const w = ctx.measureText(t.text).width + size * 1.4
+          ctx.fillStyle = 'rgba(6,6,7,0.72)'
+          ctx.beginPath()
+          ctx.roundRect(x - w / 2, y - size * 0.95, w, size * 1.9, size * 0.95)
+          ctx.fill()
+        }
+        ctx.fillStyle = t.color
+        ctx.fillText(t.text, x, y + 0.5)
+      }
+      ctx.restore()
+    }
+  }
+
+  // Slow motion closes in like a replay (bars top and bottom); a tackle flashes the edges red.
+  let bars = 0
+  let hurt = 0
+  function drawCinema() {
+    if (!gfx || reducedMotion) return
+    if (bars > 0.01) {
+      const h = H * 0.06 * smoothStep(bars)
+      ctx.fillStyle = '#020303'
+      ctx.fillRect(0, 0, W, h)
+      ctx.fillRect(0, H - h, W, h)
+    }
+    if (hurt > 0.01) {
+      const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.3, W / 2, H / 2, Math.max(W, H) * 0.75)
+      g.addColorStop(0, 'rgba(255,60,40,0)')
+      g.addColorStop(1, `rgba(255,60,40,${0.45 * hurt})`)
+      ctx.fillStyle = g
+      ctx.fillRect(0, 0, W, H)
+    }
+  }
+
+  function drawBanner() {
+    const b = S.banner
+    if (!b) return
+    const k = Math.min(1, b.age / 0.25, (2.4 - b.age) / 0.4)
+    if (k <= 0) return
+    ctx.save()
+    ctx.globalAlpha = k
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    const y = H * 0.3
+    const u = Math.max(12, unit)
+    const band = ctx.createLinearGradient(0, 0, W, 0)
+    band.addColorStop(0, 'rgba(4,5,5,0)')
+    band.addColorStop(0.5, 'rgba(4,5,5,0.86)')
+    band.addColorStop(1, 'rgba(4,5,5,0)')
+    ctx.fillStyle = band
+    ctx.fillRect(0, y - u * 2.3, W, u * 4.2)
+    // Volt rules that open out from the centre.
+    const open = smoothStep(Math.min(1, b.age / 0.45)) * W * 0.32
+    ctx.fillStyle = COLORS.volt
+    ctx.fillRect(W / 2 - open, y - u * 2.3, open * 2, 2)
+    ctx.fillRect(W / 2 - open, y + u * 1.9 - 2, open * 2, 2)
+    const slide = (1 - smoothStep(Math.min(1, b.age / 0.35))) * 24
+    ctx.fillStyle = COLORS.volt
+    ctx.font = `900 ${Math.max(18, u * 1.35)}px Archivo, sans-serif`
+    ctx.fontStretch = 'expanded'
+    if (gfx) {
+      ctx.shadowColor = COLORS.volt
+      ctx.shadowBlur = u * 0.8
+    }
+    ctx.fillText(b.title.toUpperCase(), W / 2 + slide, y - u * 0.5)
+    ctx.shadowBlur = 0
+    ctx.fillStyle = COLORS.bone
+    ctx.font = `600 ${Math.max(12, u * 0.72)}px Archivo, sans-serif`
+    ctx.fontStretch = 'normal'
+    ctx.fillText(b.sub, W / 2 - slide, y + u * 1.0)
+    ctx.restore()
+  }
+
+  function drawIdle() {
+    if (!W) return
+    if (gfx?.lost) gfx = null
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+    if (gfx) {
+      gfx.render(view3d())
+      ctx.drawImage(gfx.canvas, 0, 0, W, H)
+      return
+    }
+    drawPitch()
+    drawLines(0.35)
+    disc(0, 0, 0.7, COLORS.volt, '#ffffff')
+  }
+
+  // ---------- The flat drawing (without WebGL) ----------
 
   function drawPitch() {
     ctx.fillStyle = COLORS.turf
@@ -652,8 +982,6 @@ export function createVisionTest(
     ctx.beginPath()
     ctx.arc(sx(0), sy(0), 9.15 * scale, 0, Math.PI * 2)
     ctx.stroke()
-    // The edge of the box ahead.
-    ctx.strokeRect(sx(-20.16), sy(-52.5), 40.32 * scale, 16.5 * scale)
     ctx.restore()
   }
 
@@ -760,46 +1088,17 @@ export function createVisionTest(
     ctx.drawImage(fog, 0, 0, W, H)
   }
 
-  function drawBanner() {
-    const b = S.banner
-    if (!b) return
-    const k = Math.min(1, b.age / 0.25, (2.4 - b.age) / 0.4)
-    if (k <= 0) return
-    ctx.save()
-    ctx.globalAlpha = k
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    const y = H * 0.3
-    ctx.fillStyle = 'rgba(6,6,7,0.7)'
-    ctx.fillRect(0, y - scale * 2.2, W, scale * 4)
-    ctx.fillStyle = COLORS.volt
-    ctx.font = `900 ${Math.max(18, scale * 1.35)}px Archivo, sans-serif`
-    ctx.fontStretch = 'expanded'
-    ctx.fillText(b.title.toUpperCase(), W / 2, y - scale * 0.5)
-    ctx.fillStyle = COLORS.bone
-    ctx.font = `600 ${Math.max(12, scale * 0.72)}px Archivo, sans-serif`
-    ctx.fontStretch = 'normal'
-    ctx.fillText(b.sub, W / 2, y + scale * 1.0)
-    ctx.restore()
-  }
-
-  function draw() {
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    ctx.save()
-    if (S.shake > 0) ctx.translate(Math.sin(S.clock * 91) * S.shake * 8, Math.cos(S.clock * 77) * S.shake * 8)
+  function drawFlat() {
     drawPitch()
     drawGaze()
     drawLines(0.5)
     const R = S.round
     if (R) {
       // Only what you can see right now is drawn under the light.
-      ctx.save()
-      ctx.shadowColor = 'rgba(215,255,58,0.55)'
       for (const m of R.mates) if (visible(m)) disc(m.x, m.y, 0.6, COLORS.volt, null, String(m.n))
-      ctx.restore()
       if (visible(R.passer)) disc(R.passer.x, R.passer.y, 0.6, COLORS.volt, null, '')
       for (const o of R.opps) if (visible(o)) disc(o.x, o.y, 0.55, null, COLORS.bone)
-      for (const P of R.pressers) if (visible(P)) disc(P.x, P.y, 0.6, null, COLORS.danger)
+      for (const p of R.pressers) if (visible(p)) disc(p.x, p.y, 0.6, null, COLORS.danger)
       if (R.pass && R.phase === 'passing') {
         ctx.save()
         ctx.strokeStyle = 'rgba(215,255,58,0.35)'
@@ -827,8 +1126,8 @@ export function createVisionTest(
       // Memory ghosts: where you last saw people, fading and going stale.
       for (const m of R.mates) if (!visible(m)) ghost(m, COLORS.volt, 0.6)
       for (const o of R.opps) if (!visible(o)) ghost(o, COLORS.bone, 0.55)
-      for (const P of R.pressers) if (!visible(P)) ghost(P, COLORS.danger, 0.6)
-      // The call: a teammate shouting as they play it in, so you know which way to look for the ball.
+      for (const p of R.pressers) if (!visible(p)) ghost(p, COLORS.danger, 0.6)
+      // The call: which way to look for the ball.
       if (R.phase === 'incoming' && !visible(R.ball)) {
         const a = angleOf(R.ball.x, R.ball.y) - Math.PI / 2
         ctx.save()
@@ -866,28 +1165,6 @@ export function createVisionTest(
     ctx.stroke()
     ctx.restore()
     disc(0, 0, 0.7, COLORS.volt, '#ffffff')
-    // Toasts.
-    for (const t of S.toasts) {
-      ctx.save()
-      ctx.globalAlpha = Math.max(0, 1 - t.age / 1.3)
-      ctx.fillStyle = t.color
-      ctx.font = `${t.big ? 900 : 700} ${Math.max(t.big ? 16 : 11, scale * (t.big ? 1.5 : 0.85))}px Archivo, sans-serif`
-      ctx.fontStretch = t.big ? 'expanded' : 'normal'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText(t.big ? t.text.toUpperCase() : t.text, Math.max(80, Math.min(W - 80, sx(t.x))), sy(t.y) - t.age * 18)
-      ctx.restore()
-    }
-    drawBanner()
-    ctx.restore()
-  }
-
-  function drawIdle() {
-    if (!W) return
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    drawPitch()
-    drawLines(0.35)
-    disc(0, 0, 0.7, COLORS.volt, '#ffffff')
   }
 
   // ---------- The loop ----------
@@ -899,6 +1176,9 @@ export function createVisionTest(
     S.slow = Math.max(0, S.slow - real)
     S.shake = Math.max(0, S.shake - real)
     const dt = real * timeScale
+    vt += real
+    bars += ((S.slow > 0 ? 1 : 0) - bars) * Math.min(1, real * 8)
+    hurt = Math.max(0, hurt - real * 2.2)
     S.clock += dt
     const before = Math.ceil(S.timeLeft)
     S.timeLeft = Math.max(0, S.timeLeft - dt)
@@ -920,7 +1200,7 @@ export function createVisionTest(
       return end()
     }
     step(dt)
-    draw()
+    if (render) draw()
   }
 
   const hud = () => ({
@@ -936,7 +1216,18 @@ export function createVisionTest(
     const real = Math.min(0.05, (now - last) / 1000 || 0)
     last = now
     if (paused || !S || S.ended) return
+    if (!gfx && now < waitFor3d) return
     advance(real)
+    // Running slow in 3D: step the quality down (lower resolution, then no glow).
+    if (gfx && ++frames > 90) {
+      slowFrames = real > 0.026 ? slowFrames + 1 : Math.max(0, slowFrames - 0.5)
+      if (slowFrames > 40) {
+        slowFrames = 0
+        frames = 0
+        gfx.lower()
+        unit = gfx.scaleAt(0, 0)
+      }
+    }
     if (S && !S.ended && now - hudAt > 120) {
       hudAt = now
       onHud?.(hud())
@@ -1039,6 +1330,22 @@ export function createVisionTest(
   resize()
   last = performance.now()
   if (!manual) raf = requestAnimationFrame(frame)
+  // The 3D drawing: straight away if it is already loaded (the tutorial loads it first). On the page it
+  // loads at the visitor's first scroll, touch, key or mouse move, so it never slows the first load;
+  // a match started before it arrives waits for it (see start).
+  const INTENT = ['pointerdown', 'pointermove', 'touchstart', 'keydown', 'scroll', 'wheel']
+  const listen = !manual && graphics && !Stage
+  if (listen) for (const e of INTENT) window.addEventListener(e, want3d, { passive: true })
+  let wanted = false
+  function want3d() {
+    if (wanted) return
+    wanted = true
+    for (const e of INTENT) window.removeEventListener(e, want3d)
+    const idle = window.requestIdleCallback || ((f) => setTimeout(f, 1))
+    loadGraphics().then(() => idle(upgrade, { timeout: 400 }))
+  }
+  let waitFor3d = 0 // until when a new match waits for the 3D drawing
+  if (Stage) upgrade()
 
   return {
     /** Starts a match: mode 'match' (a minute, climbing levels) or 'practice' (one level, no clock). */
@@ -1049,7 +1356,13 @@ export function createVisionTest(
       pointer.x = null
       keys.left = keys.right = false
       sound.play('whistle')
-      if (!manual) canvas.focus({ preventScroll: true })
+      if (!manual) {
+        canvas.focus({ preventScroll: true })
+        if (graphics && !gfx) {
+          want3d()
+          waitFor3d = performance.now() + 2500
+        }
+      }
       onHud?.(hud())
     },
     /** Ends the match now (how practice finishes). */
@@ -1058,8 +1371,12 @@ export function createVisionTest(
     },
     setMuted: (m) => sound.setMuted(m),
     destroy() {
+      destroyed = true
       cancelAnimationFrame(raf)
       ro?.disconnect()
+      for (const e of INTENT) window.removeEventListener(e, want3d)
+      gfx?.dispose()
+      gfx = null
       canvas.removeEventListener('pointerdown', onPointerDown)
       canvas.removeEventListener('pointermove', onPointerMove)
       canvas.removeEventListener('pointerup', onPointerUp)
@@ -1081,8 +1398,12 @@ export function createVisionTest(
     press: (world) => passTo(world),
     /** The next round(s) will be exactly this, instead of random. */
     stage: (spec) => staged.push(spec),
-    /** Screen position of a point on the pitch (for drawing notes over the game). */
-    toScreen: (x, y) => ({ x: sx(x), y: sy(y), scale }),
+    /** Draws the current moment (with render: false, the game only draws when asked). */
+    draw: () => (S ? draw() : drawIdle()),
+    /** Screen position of a point on the pitch, h metres up, and pixels per metre there (for notes). */
+    toScreen: (x, y, h = 0) => ({ ...P(x, y, h), scale: gfx ? gfx.scaleAt(x, y) : scale }),
+    /** How the game is being drawn: 'high', 'medium' or 'low' in 3D, or 'flat'. */
+    graphics: () => (gfx ? gfx.quality : 'flat'),
     // A read-only look at the match.
     peek: () =>
       S && {

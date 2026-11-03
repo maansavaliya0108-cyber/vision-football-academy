@@ -35,6 +35,15 @@ const TRAINS = [
 ]
 
 /** Where you looked in the match, as a fan around you: brighter slices are where you looked more. */
+/** A shirt in a player's colours, for the key: the players on the pitch wear these kits. */
+function Kit({ kind }) {
+  return (
+    <svg className={`game__key game__key--${kind}`} viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8.2 3 3.6 5.4 1.8 10l3.4 1.5 1.1-2V21h11.4V9.5l1.1 2 3.4-1.5-1.8-4.6L15.8 3c-.7 1.5-2.1 2.4-3.8 2.4S8.9 4.5 8.2 3Z" />
+    </svg>
+  )
+}
+
 function VisionMap({ map }) {
   const top = Math.max(...map, 0.0001)
   const share = (idx) => Math.round(idx.reduce((s, i) => s + map[i], 0) * 100)
@@ -248,19 +257,19 @@ export default function PlayPage() {
                 </ol>
                 <ul className="game__legend" aria-label="Key">
                   <li>
-                    <span className="game__key game__key--mate" />
+                    <Kit kind="mate" />
                     Teammate
                   </li>
                   <li>
-                    <span className="game__key game__key--opp" />
+                    <Kit kind="opp" />
                     Opponent
                   </li>
                   <li>
-                    <span className="game__key game__key--press" />
+                    <Kit kind="press" />
                     Presser
                   </li>
                   <li>
-                    <span className="game__key game__key--ghost" />
+                    <Kit kind="ghost" />
                     Memory
                   </li>
                 </ul>

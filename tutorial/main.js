@@ -7,7 +7,7 @@
 // Driven by scripts/render-tutorial.mjs (npm run tutorial).
 import { ArrayBufferTarget, Muxer } from 'mp4-muxer'
 import { academy } from '../shared/academy.js'
-import { FIRST_TIME_BONUS, LEVELS, createVisionTest, soundInto } from '../src/game/visionTest.js'
+import { FIRST_TIME_BONUS, LEVELS, createVisionTest, loadGraphics, soundInto } from '../src/game/visionTest.js'
 import { tierFor, tipFor } from '../src/game/review.js'
 import { TUTORIAL_CHAPTERS as CHAPTERS, TUTORIAL_SECONDS as DURATION } from '../src/game/tutorialChapters.js'
 import '../src/styles/base.css'
@@ -25,6 +25,10 @@ const SMOKE = '#b8b8b2'
 const ASH = '#8b8b86'
 const DANGER = '#ff6a5c'
 const DEG = Math.PI / 180
+// A shirt (24 units square), the same as the key on the game page.
+const SHIRT = new Path2D(
+  'M8.2 3 3.6 5.4 1.8 10l3.4 1.5 1.1-2V21h11.4V9.5l1.1 2 3.4-1.5-1.8-4.6L15.8 3c-.7 1.5-2.1 2.4-3.8 2.4S8.9 4.5 8.2 3Z',
+)
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v))
 const smooth = (v) => v * v * (3 - 2 * v)
@@ -164,7 +168,7 @@ const SCENES = {
     notes: (k, u) => [
       u > 0.4 && { at: { x: 0, y: 0 }, text: 'You', ring: 1.3, dir: [80, 90] },
       u > 1.6 && { at: { x: 0, y: -19.5 }, text: '↑ Forward, towards goal', ring: 0, dir: [0, 0] },
-      u > 2.8 && { at: k.R()?.mates[1], text: 'Your teammates', ring: 1.2, dir: [90, -60] },
+      u > 2.8 && { at: k.R()?.mates[2], text: 'Your teammates', ring: 1.2, dir: [100, 50] },
       u > 4.2 && { at: k.R()?.opps[0], text: 'Opponents', ring: 1.1, color: BONE, dir: [-150, -40] },
     ],
     extra: 'legend',
@@ -220,8 +224,8 @@ const SCENES = {
       const m = k.R()?.mates[2]
       if (!m) return []
       return [
-        u > 3.1 && u < 4.9 && m.seen && { at: m.seen, text: 'Memory: where you last saw them', ring: 1.1, dir: [-60, -90] },
-        u > 3.6 && u < 4.9 && { at: m, text: 'Where they are now', ring: 1.0, dashed: true, dir: [90, -40] },
+        u > 3.1 && u < 4.9 && m.seen && { at: m.seen, text: 'Memory: where you last saw them', ring: 1.1, dir: [-150, 70] },
+        u > 3.6 && u < 4.9 && { at: m, text: 'Where they are now', ring: 1.0, dashed: true, dir: [80, -60] },
         u > 5.3 && u < 6.6 && { at: m, text: 'They moved', ring: 1.2, dir: [90, -40] },
         u > 7.2 && { at: k.R().mates[0].seen, text: 'Memories fade in 3.5 seconds', ring: 1.1, dir: [-40, -90] },
       ]
@@ -505,7 +509,7 @@ const SCENES = {
   score: { auto: true, mode: 'match', level: 3, seed: 31, extra: 'scoring', hud: true },
   results: { auto: true, level: 2, seed: 41, extra: null, card: true },
   practice: { auto: true, lazy: true, level: 2, seed: 51, hints: true, hud: true, extra: 'keys' },
-  end: { auto: true, level: 5, seed: 61, extra: 'end', dim: true },
+  end: { auto: true, level: 5, seed: 63, extra: 'end', dim: true },
 }
 
 // The words in the panel for each chapter.
@@ -515,7 +519,7 @@ const COPY = {
   you: 'You are the pivot in the centre circle, seen from above. Up the screen is forward, towards the goal. Your teammates are ahead of you, numbered; the ball will come to you from behind.',
   look: 'You only see what you look at: everything outside your cone of vision is dark. Turn your head with the mouse, by dragging a finger, or by holding the arrow keys.',
   memory:
-    'Look away and people stay where you last saw them, as dashed memories. A memory fades after 3.5 seconds, and it goes out of date: players keep moving.',
+    'Look away and people stay where you last saw them, as see-through memories. A memory fades after 3.5 seconds, and it goes out of date: players keep moving.',
   ball: 'A teammate plays the ball in from behind, and a flashing arc shows which side it is coming from. Turn and watch it in. If you have not looked at it just before it arrives, your first touch is heavy and you lose a moment.',
   pass: 'When the ball arrives, pass to the open teammate: click them, or tap them on a phone. On a keyboard, press their number, or Space for the one you are facing. A teammate you can see gets the ball played into their run.',
   lane: 'A defender shadows every lane but one. Pass into a covered lane and it is intercepted. Look along the line of the pass, not just at the player, and find the lane nobody is in.',
@@ -553,8 +557,10 @@ let cur = null
 function enter(chapter) {
   cur?.g.destroy()
   const sc = SCENES[chapter.id]
+  // The game draws once per video frame (in compose), not on each of its steps.
   const g = createVisionTest(game, {
     manual: true,
+    render: false,
     sound: {
       play: (name) => recording && (name !== 'whistle' || sc.whistle) && sounds.push([simT, name]),
       unlock() {},
@@ -640,6 +646,8 @@ function exampleResult() {
   let result = null
   const g = createVisionTest(c, {
     manual: true,
+    render: false,
+    graphics: false,
     sound: { play() {}, unlock() {}, setMuted() {}, close() {} },
     onEnd: (r) => (result = r),
   })
@@ -736,28 +744,41 @@ function note(ctx, n, alpha) {
     return
   }
   const p = g.toScreen(n.at.x, n.at.y)
-  const r = (n.ring ?? 1.1) * p.scale
-  if (r > 0) {
+  const ring = n.ring ?? 1.1
+  const [dx, dy] = n.dir || [80, -80]
+  const len = Math.hypot(dx, dy)
+  // The ring lies on the pitch, so it is drawn in perspective; the leader leaves it facing its tag.
+  const edge = groundRing(ctx, g, n.at, ring)
+  if (ring > 0) {
     ctx.strokeStyle = color
     ctx.lineWidth = 4
     if (n.dashed) ctx.setLineDash([10, 8])
-    ctx.beginPath()
-    ctx.arc(p.x, p.y, r, 0, Math.PI * 2)
     ctx.stroke()
     ctx.setLineDash([])
   }
-  const [dx, dy] = n.dir || [80, -80]
-  const len = Math.hypot(dx, dy)
-  if (len > 0 && r > 0) {
+  if (len > 0 && ring > 0) {
+    const from = edge.reduce((a, b) => ((b.x - p.x) * dx + (b.y - p.y) * dy > (a.x - p.x) * dx + (a.y - p.y) * dy ? b : a))
     ctx.strokeStyle = color
     ctx.lineWidth = 2.5
     ctx.beginPath()
-    ctx.moveTo(p.x + (dx / len) * r, p.y + (dy / len) * r)
+    ctx.moveTo(from.x, from.y)
     ctx.lineTo(p.x + dx, p.y + dy)
     ctx.stroke()
   }
   tag(ctx, n.text, p.x + dx, p.y + dy, color, len === 0 ? 'center' : dx < 0 ? 'right' : 'left')
   ctx.restore()
+}
+/** Starts a path round a circle of radius r metres on the pitch, and returns its points on screen. */
+function groundRing(ctx, g, at, r) {
+  const pts = []
+  for (let i = 0; i < 48; i++) {
+    const a = (i / 48) * Math.PI * 2
+    pts.push(g.toScreen(at.x + Math.sin(a) * r, at.y - Math.cos(a) * r))
+  }
+  ctx.beginPath()
+  pts.forEach((q, i) => (i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)))
+  ctx.closePath()
+  return pts
 }
 function tag(ctx, str, x, y, color, align = 'left') {
   ctx.save()
@@ -991,17 +1012,20 @@ function extra(ctx, kind, y) {
     items.forEach(([key, label], j) => {
       const cx = PX + 22 + (j % 2) * 300
       const cy = y + 20 + Math.floor(j / 2) * 64
+      // The players' kits, as on the page's key.
       ctx.save()
-      ctx.beginPath()
-      ctx.arc(cx, cy, 16, 0, Math.PI * 2)
-      if (key === 'mate') {
-        ctx.fillStyle = VOLT
-        ctx.fill()
+      ctx.translate(cx - 19, cy - 19)
+      ctx.scale(38 / 24, 38 / 24)
+      if (key === 'ghost') {
+        ctx.fillStyle = 'rgba(215,255,58,0.16)'
+        ctx.fill(SHIRT)
+        ctx.strokeStyle = VOLT
+        ctx.lineWidth = 1.4
+        ctx.setLineDash([2.2, 1.8])
+        ctx.stroke(SHIRT)
       } else {
-        ctx.strokeStyle = key === 'press' ? DANGER : key === 'ghost' ? VOLT : BONE
-        ctx.lineWidth = 4
-        if (key === 'ghost') ctx.setLineDash([7, 6])
-        ctx.stroke()
+        ctx.fillStyle = key === 'mate' ? VOLT : key === 'press' ? DANGER : BONE
+        ctx.fill(SHIRT)
       }
       ctx.restore()
       text(ctx, label, cx + 34, cy + 10, 28, { weight: 700 })
@@ -1085,6 +1109,7 @@ function frameCanvas() {
 
 async function compose(t) {
   simulate(t)
+  cur.g.draw()
   const { chapter, sc, k } = cur
   const u = t - chapter.at
   const c = frameCanvas()
@@ -1291,6 +1316,7 @@ window.renderTutorial = async (bitrate = 3.5e6) => {
   return { bytes: bytes.length, sounds: sounds.length }
 }
 
+await loadGraphics()
 await document.fonts.load('900 60px Archivo')
 await document.fonts.load('800 26px Archivo')
 await document.fonts.load('500 30px Archivo')

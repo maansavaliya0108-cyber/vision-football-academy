@@ -48,7 +48,7 @@ try {
       if (last) console.log(`public/media/${FILE}.mp4 written`)
     })
     const started = Date.now()
-    const { bytes, sounds } = await page.evaluate(() => window.renderTutorial())
+    const { bytes, sounds } = await page.evaluate(() => window.renderTutorial(2.6e6))
     console.log(`${(bytes / 1e6).toFixed(1)} MB in ${Math.round((Date.now() - started) / 1000)} s, ${sounds} game sounds`)
     save(join(media, `${FILE}.jpg`), await page.evaluate((t) => window.renderStill(t), POSTER_AT))
   }
